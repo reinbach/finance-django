@@ -16,6 +16,11 @@ class ContactView(FormView):
     def get_success_url(self):
         return reverse("contact")
 
+    def get_context_data(self, **kwargs):
+        kwargs = super(ContactView, self).get_context_data(**kwargs)
+        kwargs["page"] = "contact"
+        return kwargs
+
     def form_valid(self, form):
         form.send_email()
         messages.success(self.request,

@@ -14,8 +14,15 @@
             <h3 class="masthead-brand">Finance</h3>
             <nav>
               <ul class="nav masthead-nav">
-                <li class="active"><a href="{% url 'home' %}">Home</a></li>
-                <li><a href="{% url 'contact' %}">Contact</a></li>
+                <li{% if page != "contact" %} class="active"{% endif %}>
+                  <a href="{% url 'home' %}">Home</a>
+                </li>
+                <li{% if page == "contact" %} class="active"{% endif %}>
+                  <a href="{% url 'contact' %}">Contact</a>
+                </li>
+                {% if user.is_authenticated %}
+                  <li><a href="#">Dashboard</a></li>
+                {% endif %}
               </ul>
             </nav>
           </div>
@@ -40,7 +47,7 @@
 
         <div class="mastfoot">
           <div class="inner">
-            <p><a href="http://www.ironlabs.com">IRON Labs, Inc.</a></p>
+            <p>Create by <a href="http://www.ironlabs.com">IRON Labs, Inc.</a></p>
           </div>
         </div>
       </div>

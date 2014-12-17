@@ -8,7 +8,8 @@
       {% bootstrap_form form %}
       {% buttons %}
         <input type="submit" class="btn btn-info" value="Register" />
-        {% endbuttons %}
+        <a href="{% url 'home' %}" class="btn btn-default">Cancel</a>
+      {% endbuttons %}
     </form>
   </div>
 {% endblock page-content %}
