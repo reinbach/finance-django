@@ -1,0 +1,20 @@
+{% extends "home.html" %}
+{% load bootstrap3 %}
+
+{% block page-content %}
+  <div class="col-md-6 col-md-offset-3">
+    <form method="post" action="" class="text-left">
+      {% csrf_token %}
+      {% bootstrap_form form %}
+      {% buttons %}
+        <input type="submit" class="btn btn-success" value="Sign In" />
+        <a href="{% url 'password_reset' %}" class="btn btn-default">
+          Forgot Password
+        </a>
+        <a href="{% url 'register' %}" class="btn btn-info">
+          Register
+        </a>
+        {% endbuttons %}
+    </form>
+  </div>
+{% endblock page-content %}

@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% load staticfiles bootstrap3 %}
+
+{% block page-css %}
+  <link href="{% static 'css/cover.css' %}" rel="stylesheet">
+{% endblock page-css %}
+
+{% block content %}
+  <div class="site-wrapper">
+    <div class="site-wrapper-inner">
+      <div class="cover-container">
+        <div class="masthead clearfix">
+          <div class="inner">
+            <h3 class="masthead-brand">Finance</h3>
+            <nav>
+              <ul class="nav masthead-nav">
+                <li class="active"><a href="{% url 'home' %}">Home</a></li>
+                <li><a href="#">Features</a></li>
+                <li><a href="#">Contact</a></li>
+              </ul>
+            </nav>
+          </div>
+        </div>
+
+        <div class="inner cover">
+          {% bootstrap_messages %}
+
+          {% block page-content %}
+            <h1 class="cover-heading">Your Finances.</h1>
+            <p class="lead">A single place to view your finances.</p>
+            <p class="lead">
+              <a href="{% url 'register' %}" class="btn btn-lg btn-info">
+                Register
+              </a>
+              <a href="{% url 'login' %}" class="btn btn-lg btn-success">
+                Sign In
+              </a>
+            </p>
+          {% endblock page-content %}
+        </div>
+
+        <div class="mastfoot">
+          <div class="inner">
+            <p><a href="http://www.ironlabs.com">IRON Labs, Inc.</a></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock content %}
