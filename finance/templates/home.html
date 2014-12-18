@@ -21,7 +21,9 @@
                   <a href="{% url 'contact' %}">Contact</a>
                 </li>
                 {% if user.is_authenticated %}
-                  <li><a href="#">Dashboard</a></li>
+                  <li>
+                    <a href="{% url 'accounts.dashboard' %}">Dashboard</a>
+                  </li>
                 {% endif %}
               </ul>
             </nav>
