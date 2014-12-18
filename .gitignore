@@ -26,11 +26,7 @@ pip-log.txt
 .coverage
 .tox
 nosetests.xml
+~build/
 
 # Translations
 *.mo
-
-# Mr Developer
-.mr.developer.cfg
-.project
-.pydevproject
