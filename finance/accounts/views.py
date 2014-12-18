@@ -1,8 +1,8 @@
 from django.contrib import messages
 from django.core.urlresolvers import reverse_lazy
 from django.views.generic import (TemplateView, CreateView, UpdateView,
-                                  DeleteView)
-from finance.accounts.models import AccountType
+                                  DeleteView, ListView)
+from finance.accounts.models import AccountType, Account
 
 
 class DashboardView(TemplateView):
@@ -54,4 +54,62 @@ class AccountTypeDeleteView(DeleteView):
         response = super(AccountTypeDeleteView, self).post(request, *args,
                                                            **kwargs)
         messages.success(request, u"Successfully deleted Account Type")
+        return response
+
+
+class AccountView(ListView):
+    model = Account
+
+    def get_context_data(self, **kwargs):
+        kwargs = super(AccountView, self).get_context_data(**kwargs)
+        kwargs["page"] = "accounts"
+        return kwargs
+
+
+class AccountAddView(CreateView):
+    model = Account
+    success_url = reverse_lazy("accounts.account.list")
+
+    def get_context_data(self, **kwargs):
+        kwargs = super(AccountAddView, self).get_context_data(**kwargs)
+        kwargs["page"] = "accounts"
+        return kwargs
+
+    def form_valid(self, form):
+        response = super(AccountAddView, self).form_valid(form)
+        messages.success(self.request,
+                         u"Succcessfully added Account {0}".format(
+                             form.cleaned_data["name"]
+                         )
+        )
+        return response
+
+
+class AccountEditView(UpdateView):
+    model = Account
+    success_url = reverse_lazy("accounts.account.list")
+
+    def get_context_data(self, **kwargs):
+        kwargs = super(AccountEditView, self).get_context_data(**kwargs)
+        kwargs["page"] = "accounts"
+        return kwargs
+
+    def form_valid(self, form):
+        response = super(AccountEditView, self).form_valid(form)
+        messages.success(self.request,
+                         u"Succcessfully updated Account {0}".format(
+                             form.cleaned_data["name"]
+                         )
+        )
+        return response
+
+
+class AccountDeleteView(DeleteView):
+    model = Account
+    success_url = reverse_lazy("accounts.account.list")
+
+    def post(self, request, *args, **kwargs):
+        response = super(AccountDeleteView, self).post(request, *args,
+                                                           **kwargs)
+        messages.success(request, u"Successfully deleted Account")
         return response
