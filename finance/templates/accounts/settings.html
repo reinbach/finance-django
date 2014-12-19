@@ -21,8 +21,8 @@
             <td>{{ forloop.counter }}</td>
             <td>{{ account_type.name }}</td>
             <td>
-              <a href="{% url 'accounts.account_type.edit' account_type.pk %}" class="btn btn-default">Edit</a>
-              <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#accountTypeModalDelete{{ account_type.pk }}">Delete</button>
+              <a href="{% url 'accounts.account_type.edit' account_type.pk %}" class="btn btn-sm btn-default">Edit</a>
+              <button type="button" class="btn btn-sm btn-danger" data-toggle="modal" data-target="#accountTypeModalDelete{{ account_type.pk }}">Delete</button>
               <div class="modal fade" id="accountTypeModalDelete{{ account_type.pk }}" tabindex="-1" role="dialog" aria-labelledby="#accountTypeModalDelete{{ account_type.pk }}" aria-hidden="true">
                 <div class="modal-dialog">
                   <div class="modal-content">

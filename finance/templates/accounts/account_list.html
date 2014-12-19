@@ -24,8 +24,8 @@
             <td>{{ account.account_type.name }}</td>
             <td class="text-right">{{ account.balance|floatformat:"2" }}</td>
             <td>
-              <a href="{% url 'accounts.account.edit' account.pk %}" class="btn btn-default">Edit</a>
-              <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#accountModalDelete{{ account.pk }}">Delete</button>
+              <a href="{% url 'accounts.account.edit' account.pk %}" class="btn btn-sm btn-default">Edit</a>
+              <button type="button" class="btn btn-sm btn-danger" data-toggle="modal" data-target="#accountModalDelete{{ account.pk }}">Delete</button>
               <div class="modal fade" id="accountModalDelete{{ account.pk }}" tabindex="-1" role="dialog" aria-labelledby="#accountModalDelete{{ account.pk }}" aria-hidden="true">
                 <div class="modal-dialog">
                   <div class="modal-content">
