@@ -30,7 +30,8 @@ class Account(models.Model):
     @property
     def balance(self):
         """Current balance of account"""
-        balance = self.get_total(self.debit.all()) - self.get_total(self.credit.all())
+        balance = self.get_total(self.debit.all()) - self.get_total(
+            self.credit.all())
         return balance
 
     def transactions(self):
@@ -39,7 +40,8 @@ class Account(models.Model):
         We want to clearly indicate the opposite account
         And maintain a running balance for each transaction
         """
-        trxs = Transaction.objects.filter(Q(account_debit=self) | Q(account_credit=self))
+        trxs = Transaction.objects.filter(Q(account_debit=self) |
+                                          Q(account_credit=self))
         trx_list = []
         balance = 0
         for trx in trxs:
@@ -64,7 +66,7 @@ class Transaction(models.Model):
         ordering = ["date", ]
 
     def __unicode__(self):
-        #TODO determine account debit and then show amount in
+        # TODO determine account debit and then show amount in
         # negative or positive
         # or think of a better short description of transaction to show
         return u"{summary} {amount}".format(

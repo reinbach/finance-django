@@ -27,8 +27,7 @@ class AccountTypeAddView(CreateView):
         messages.success(self.request,
                          u"Succcessfully added Account Type {0}".format(
                              form.cleaned_data["name"]
-                         )
-        )
+                         ))
         return response
 
 
@@ -41,8 +40,7 @@ class AccountTypeEditView(UpdateView):
         messages.success(self.request,
                          u"Succcessfully updated Account Type {0}".format(
                              form.cleaned_data["name"]
-                         )
-        )
+                         ))
         return response
 
 
@@ -80,8 +78,7 @@ class AccountAddView(CreateView):
         messages.success(self.request,
                          u"Succcessfully added Account {0}".format(
                              form.cleaned_data["name"]
-                         )
-        )
+                         ))
         return response
 
 
@@ -99,8 +96,7 @@ class AccountEditView(UpdateView):
         messages.success(self.request,
                          u"Succcessfully updated Account {0}".format(
                              form.cleaned_data["name"]
-                         )
-        )
+                         ))
         return response
 
 
@@ -110,6 +106,6 @@ class AccountDeleteView(DeleteView):
 
     def post(self, request, *args, **kwargs):
         response = super(AccountDeleteView, self).post(request, *args,
-                                                           **kwargs)
+                                                       **kwargs)
         messages.success(request, u"Successfully deleted Account")
         return response
