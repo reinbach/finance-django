@@ -12,4 +12,4 @@ class Profile(models.Model):
     created = models.DateTimeField(auto_now_add=True)
 
     def __unicode__(self):
-        return u"{0}".format(self.name)
+        return u"{0}".format(self.user.username)

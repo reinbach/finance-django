@@ -11,7 +11,7 @@ class ContactForm(forms.Form):
     message = forms.CharField(widget=forms.Textarea)
 
     def send_email(self):
-        send_mail("Hello from KidVM", self.cleaned_data["message"],
+        send_mail("Hello from Finance", self.cleaned_data["message"],
                   self.cleaned_data.get("email", 'unknown'),
                   [settings.EMAIL_ADDRESS], fail_silently=True)
 
