@@ -2,6 +2,7 @@ from django import forms
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.mail import send_mail
+from finance.core.models import Profile
 
 
 class ContactForm(forms.Form):
@@ -31,4 +32,5 @@ class RegisterForm(forms.Form):
         user = User.objects.create_user(self.cleaned_data['email'],
                                         self.cleaned_data['email'],
                                         self.cleaned_data['password'])
+        Profile.objects.create(user=user)
         return user

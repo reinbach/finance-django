@@ -1,9 +1,11 @@
 from django.db import models
 from django.db.models import Q
+from finance.core.models import Profile
 
 
 class AccountType(models.Model):
     name = models.CharField(max_length=20, unique=True)
+    profile = models.ForeignKey(Profile)
 
     def __unicode__(self):
         return self.name
@@ -13,6 +15,7 @@ class Account(models.Model):
     name = models.CharField(max_length=50, unique=True)
     description = models.CharField(max_length=250)
     account_type = models.ForeignKey(AccountType)
+    profile = models.ForeignKey(Profile)
 
     def __unicode__(self):
         return u"{name} [{account_type}]".format(
