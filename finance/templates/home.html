@@ -36,14 +36,16 @@
           {% block page-content %}
             <h1 class="cover-heading">Your Finances.</h1>
             <p class="lead">A single place to view your finances.</p>
-            <p class="lead">
-              <a href="{% url 'register' %}" class="btn btn-lg btn-info">
-                Register
-              </a>
-              <a href="{% url 'login' %}" class="btn btn-lg btn-success">
-                Log In
-              </a>
-            </p>
+            {% if not user.is_authenticated %}
+              <p class="lead">
+                <a href="{% url 'register' %}" class="btn btn-lg btn-info">
+                  Register
+                </a>
+                <a href="{% url 'login' %}" class="btn btn-lg btn-success">
+                  Log In
+                </a>
+              </p>
+            {% endif %}
           {% endblock page-content %}
         </div>
 
