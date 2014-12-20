@@ -89,6 +89,7 @@ class AccountView(ListView):
 class AccountAddView(CreateView):
     model = Account
     success_url = reverse_lazy("accounts.account.list")
+    fields = ["name", "description", "account_type"]
 
     def get_context_data(self, **kwargs):
         kwargs = super(AccountAddView, self).get_context_data(**kwargs)
@@ -116,6 +117,7 @@ class AccountAddView(CreateView):
 class AccountEditView(UpdateView):
     model = Account
     success_url = reverse_lazy("accounts.account.list")
+    fields = ["name", "description", "account_type"]
 
     def get_context_data(self, **kwargs):
         kwargs = super(AccountEditView, self).get_context_data(**kwargs)

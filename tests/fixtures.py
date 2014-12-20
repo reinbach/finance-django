@@ -28,7 +28,12 @@ def account_type_factory(**kwargs):
 
 def account_factory(**kwargs):
     if "account_type" not in kwargs:
-        kwargs["account_type"] = account_type_factory()
+        if "profile" in kwargs:
+            kwargs["account_type"] = account_type_factory(
+                profile=kwargs["profile"]
+            )
+        else:
+            kwargs["account_type"] = account_type_factory()
     if "profile" not in kwargs:
         kwargs["profile"] = kwargs["account_type"].profile
     return G(Account, **kwargs)
