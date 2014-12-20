@@ -15,3 +15,11 @@ class AccountTypeForm(forms.ModelForm):
                     pk=self.instance.pk
             ).exists():
                 raise forms.ValidationError("Name needs to be unique")
+
+
+class TransactionImportForm(forms.Form):
+    filename = forms.FileField()
+
+    def process(self):
+        # TODO process the uploaded file and create transactions
+        pass
