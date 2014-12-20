@@ -238,6 +238,7 @@ class TransactionDeleteView(DeleteView):
 
 
 class TransactionImportView(FormView):
+    template_name = "accounts/transaction_import.html"
     form_class = TransactionImportForm
     success_url = reverse_lazy("accounts.transaction.list")
 
