@@ -1,6 +1,7 @@
 import pytest
 
-from finance.core.models import get_user_profile
+from django.db import IntegrityError
+from finance.core.models import get_user_profile, Profile
 from tests.fixtures import user_factory, profile_factory
 
 
@@ -17,3 +18,10 @@ class TestProfile():
     def test_unicode(self):
         p = profile_factory(user__username="user")
         assert unicode(p) == "user"
+
+    def test_uniqueness(self):
+        u = user_factory()
+        profile_factory(user=u)
+        with pytest.raises(IntegrityError):
+            p = Profile(user=u)
+            p.save()

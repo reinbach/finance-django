@@ -7,7 +7,7 @@ def get_user_profile(user):
 
 
 class Profile(models.Model):
-    user = models.ForeignKey(User)
+    user = models.ForeignKey(User, unique=True)
     is_active = models.BooleanField(default=True)
     created = models.DateTimeField(auto_now_add=True)
 

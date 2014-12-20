@@ -2,6 +2,7 @@ from django.contrib import messages
 from django.core.urlresolvers import reverse_lazy
 from django.views.generic import (TemplateView, CreateView, UpdateView,
                                   DeleteView, ListView)
+from finance.accounts.forms import AccountTypeForm
 from finance.accounts.models import AccountType, Account
 from finance.core.models import get_user_profile
 
@@ -24,12 +25,13 @@ class SettingsView(TemplateView):
 class AccountTypeAddView(CreateView):
     model = AccountType
     success_url = reverse_lazy("accounts.settings")
+    form_class = AccountTypeForm
 
     def form_valid(self, form):
         form.instance.profile = get_user_profile(self.request.user)
         response = super(AccountTypeAddView, self).form_valid(form)
         messages.success(self.request,
-                         u"Succcessfully added Account Type {0}".format(
+                         u"Successfully added Account Type {0}".format(
                              form.cleaned_data["name"]
                          ))
         return response
@@ -38,6 +40,7 @@ class AccountTypeAddView(CreateView):
 class AccountTypeEditView(UpdateView):
     model = AccountType
     success_url = reverse_lazy("accounts.settings")
+    form_class = AccountTypeForm
 
     def get_queryset(self):
         qs = super(AccountTypeEditView, self).get_queryset()
@@ -47,7 +50,7 @@ class AccountTypeEditView(UpdateView):
     def form_valid(self, form):
         response = super(AccountTypeEditView, self).form_valid(form)
         messages.success(self.request,
-                         u"Succcessfully updated Account Type {0}".format(
+                         u"Successfully updated Account Type {0}".format(
                              form.cleaned_data["name"]
                          ))
         return response
@@ -104,7 +107,7 @@ class AccountAddView(CreateView):
         form.instance.profile = get_user_profile(self.request.user)
         response = super(AccountAddView, self).form_valid(form)
         messages.success(self.request,
-                         u"Succcessfully added Account {0}".format(
+                         u"Successfully added Account {0}".format(
                              form.cleaned_data["name"]
                          ))
         return response
@@ -135,7 +138,7 @@ class AccountEditView(UpdateView):
     def form_valid(self, form):
         response = super(AccountEditView, self).form_valid(form)
         messages.success(self.request,
-                         u"Succcessfully updated Account {0}".format(
+                         u"Successfully updated Account {0}".format(
                              form.cleaned_data["name"]
                          ))
         return response
