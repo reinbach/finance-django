@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block page-content %}
+  <h1 class="page-header">Transactions</h1>
+
+  <div class="table-responsive">
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Debit</th>
+          <th>Credit</th>
+          <th>Amount</th>
+          <th>Summary</th>
+          <th>Description</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for trx in object_list %}
+          <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>{{ trx.account_debit }}</td>
+            <td>{{ trx.account_credit }}</td>
+            <td class="text-right">{{ trx.amount|floatformat:"2" }}</td>
+            <td>{{ trx.summary }}</td>
+            <td>{{ trx.description }}</td>
+            <td>
+              <a href="{% url 'accounts.transaction.edit' trx.pk %}" class="btn btn-sm btn-default">Edit</a>
+              <button type="button" class="btn btn-sm btn-danger" data-toggle="modal" data-target="#trxModalDelete{{ trx.pk }}">Delete</button>
+              <div class="modal fade" id="trxModalDelete{{ trx.pk }}" tabindex="-1" role="dialog" aria-labelledby="#trxModalDelete{{ trx.pk }}" aria-hidden="true">
+                <div class="modal-dialog">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                      <h4 class="modal-title">Delete Transaction</h4>
+                    </div>
+                    <div class="modal-body">
+                      <p>Are you sure you want to delete this transaction?</p>
+                    </div>
+                    <div class="modal-footer">
+                      <form method="post" action="{% url 'accounts.transaction.delete' trx.pk %}">
+                        {% csrf_token %}
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-danger">Delete Transaction</button>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <p>
+      <a href="{% url 'accounts.transaction.add' %}" class="btn btn-default">
+        Add Transaction
+      </a>
+      <a href="{% url 'accounts.transaction.import' %}" class="btn btn-default">
+        Import Transactions
+      </a>
+
+    </p>
+  </div>
+{% endblock page-content %}

@@ -4,7 +4,10 @@ from finance.accounts.views import (DashboardView, SettingsView,
                                     AccountTypeAddView, AccountTypeEditView,
                                     AccountTypeDeleteView, AccountView,
                                     AccountAddView, AccountEditView,
-                                    AccountDeleteView)
+                                    AccountDeleteView, TransactionView,
+                                    TransactionAddView, TransactionEditView,
+                                    TransactionDeleteView,
+                                    TransactionImportView)
 
 
 urlpatterns = patterns(
@@ -34,4 +37,19 @@ urlpatterns = patterns(
         name="accounts.account.edit"),
     url("^delete/(?P<pk>\d+)/$", login_required(AccountDeleteView.as_view()),
         name="accounts.account.delete"),
+
+    # transactions
+    url("^transaction/list/$", login_required(TransactionView.as_view()),
+        name="accounts.transaction.list"),
+    url("^transaction/add/$", login_required(TransactionAddView.as_view()),
+        name="accounts.transaction.add"),
+    url("^transaction/edit/(?P<pk>\d+)/$",
+        login_required(TransactionEditView.as_view()),
+        name="accounts.transaction.edit"),
+    url("^transaction/delete/(?P<pk>\d+)/$",
+        login_required(TransactionDeleteView.as_view()),
+        name="accounts.transaction.delete"),
+    url("^transaction/import/$",
+        login_required(TransactionImportView.as_view()),
+        name="accounts.transaction.import"),
 )

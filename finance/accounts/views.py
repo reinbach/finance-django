@@ -1,9 +1,9 @@
 from django.contrib import messages
 from django.core.urlresolvers import reverse_lazy
 from django.views.generic import (TemplateView, CreateView, UpdateView,
-                                  DeleteView, ListView)
-from finance.accounts.forms import AccountTypeForm
-from finance.accounts.models import AccountType, Account
+                                  DeleteView, ListView, FormView)
+from finance.accounts.forms import AccountTypeForm, TransactionImportForm
+from finance.accounts.models import AccountType, Account, Transaction
 from finance.core.models import get_user_profile
 
 
@@ -160,3 +160,88 @@ class AccountDeleteView(DeleteView):
                                                        **kwargs)
         messages.success(request, u"Successfully deleted Account")
         return response
+
+
+class TransactionView(ListView):
+    model = Transaction
+
+    def get_queryset(self):
+        qs = super(TransactionView, self).get_queryset()
+        qs = qs.filter(account_debit__profile__user=self.request.user)
+        return qs
+
+    def get_context_data(self, **kwargs):
+        kwargs = super(TransactionView, self).get_context_data(**kwargs)
+        kwargs["page"] = "transactions"
+        return kwargs
+
+
+class TransactionAddView(CreateView):
+    model = Transaction
+    success_url = reverse_lazy("accounts.transaction.list")
+
+    def get_form(self, form_class):
+        form = super(TransactionAddView, self).get_form(form_class)
+        profile = get_user_profile(self.request.user)
+        account_choices = [("", "-" * 9)] + [(x.pk, x.name) for x in
+                                             Account.objects.filter(
+                                                 profile=profile)]
+        form.fields["account_debit"].choices = account_choices
+        form.fields["account_credit"].choices = account_choices
+        return form
+
+    def get_context_data(self, **kwargs):
+        kwargs = super(TransactionAddView, self).get_context_data(**kwargs)
+        kwargs["page"] = "transactions"
+        return kwargs
+
+    def form_valid(self, form):
+        response = super(TransactionAddView, self).form_valid(form)
+        messages.success(self.request, u"Successfully added Transaction")
+        return response
+
+
+class TransactionEditView(UpdateView):
+    model = Transaction
+    success_url = reverse_lazy("accounts.transaction.list")
+
+    def get_queryset(self):
+        qs = super(TransactionEditView, self).get_queryset()
+        qs = qs.filter(account_debit__profile__user=self.request.user)
+        return qs
+
+    def get_context_data(self, **kwargs):
+        kwargs = super(TransactionEditView, self).get_context_data(**kwargs)
+        kwargs["page"] = "transactions"
+        return kwargs
+
+    def form_valid(self, form):
+        response = super(TransactionEditView, self).form_valid(form)
+        messages.success(self.request, u"Successfully updated Transaction")
+        return response
+
+
+class TransactionDeleteView(DeleteView):
+    model = Transaction
+    success_url = reverse_lazy("accounts.transaction.list")
+
+    def get_queryset(self):
+        qs = super(TransactionDeleteView, self).get_queryset()
+        qs = qs.filter(account_debit__profile__user=self.request.user)
+        return qs
+
+    def post(self, request, *args, **kwargs):
+        response = super(TransactionDeleteView, self).post(request, *args,
+                                                       **kwargs)
+        messages.success(request, u"Successfully deleted Transaction")
+        return response
+
+
+class TransactionImportView(FormView):
+    form_class = TransactionImportForm
+    success_url = reverse_lazy("accounts.transaction.list")
+
+    def get_context_data(self, **kwargs):
+        kwargs = super(TransactionImportView, self).get_context_data(**kwargs)
+        kwargs["page"] = "transactions"
+        return kwargs

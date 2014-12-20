@@ -18,7 +18,7 @@ class TestAccount():
     def test_unicode(self):
         at = account_type_factory(name="acct-type")
         a = Account(name="acct", account_type=at)
-        assert unicode(a) == "acct [acct-type]"
+        assert unicode(a) == "acct"
 
     def test_get_total(self):
         a1 = account_factory()
