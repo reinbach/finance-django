@@ -257,7 +257,7 @@ class TransactionImportView(FormView):
                                      user=self.request.user)
         return render_to_response(
             "accounts/transaction_form_multiple.html",
-            self.get_context_data(formset=formset),
+            self.get_context_data(form=formset),
             context_instance=RequestContext(self.request)
         )
 

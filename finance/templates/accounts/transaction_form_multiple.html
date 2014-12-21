@@ -4,11 +4,11 @@
 {% block page-content %}
   <h1 class="page-header">Transactions</h1>
 
-  <h2 class="sub-header">Import Transactions</h2>
+  <h2 class="sub-header">Confirm Import Transactions</h2>
   <div class="table-responsive">
     <form method="post" action="{% url 'accounts.transaction.import.confirm' %}" role="form" class="form-inline">
       {% csrf_token %}
-      {% bootstrap_form formset.management_form %}
+      {% bootstrap_form form.management_form %}
       <table class="table table-striped">
         <thead>
           <tr>
@@ -22,15 +22,15 @@
           </tr>
         </thead>
         <tbody>
-          {% for form in formset %}
+          {% for f in form %}
             <tr>
               <td>{{ forloop.counter }}</td>
-              <td>{% bootstrap_field form.account_debit layout="inline" %}</td>
-              <td>{% bootstrap_field form.account_credit layout="inline" %}</td>
-              <td>{% bootstrap_field form.amount layout="inline" %}</td>
-              <td>{% bootstrap_field form.summary layout="inline" %}</td>
-              <td>{% bootstrap_field form.date layout="inline" %}</td>
-              <td>{% bootstrap_field form.DELETE layout="inline" %}</td>
+              <td>{% bootstrap_field f.account_debit layout="inline" %}</td>
+              <td>{% bootstrap_field f.account_credit layout="inline" %}</td>
+              <td>{% bootstrap_field f.amount layout="inline" %}</td>
+              <td>{% bootstrap_field f.summary layout="inline" %}</td>
+              <td>{% bootstrap_field f.date layout="inline" %}</td>
+              <td>{% bootstrap_field f.DELETE layout="inline" %}</td>
             </tr>
           {% endfor %}
         </tbody>

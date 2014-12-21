@@ -1,5 +1,7 @@
 import datetime
+import os
 
+from django.conf import settings
 from django.core.urlresolvers import reverse
 from finance.accounts.models import AccountType, Account, Transaction
 from decimal import Decimal
@@ -338,8 +340,8 @@ class TestTransactionView(BaseWebTest):
         transaction_factory(account_debit=self.acct1,
                             account_credit=self.acct2, amount="10.00")
         profile = profile_factory()
-        acct1 = account_factory(profile=profile)
-        acct2 = account_factory(profile=profile)
+        acct1 = account_factory(profile=profile, name="n_acct1")
+        acct2 = account_factory(profile=profile, name="n_acct2")
         transaction_factory(account_debit=acct1,
                             account_credit=acct2, amount="5.00")
         response = self.app.get(reverse("accounts.transaction.list"),
@@ -482,3 +484,75 @@ class TestTransactionDeleteView(BaseWebTest):
                                  user=self.user, expect_errors=True)
         assert response.status_code == 404
         assert Transaction.objects.filter(pk=trx.pk).exists() is True
+
+
+class TestTransactionImportView(BaseWebTest):
+    def setUp(self):
+        super(TestTransactionImportView, self).setUp()
+        self.acct1 = account_factory(profile=self.profile)
+        self.acct2 = account_factory(profile=self.profile)
+        self.sample_file = os.path.join(settings.BASE_DIR,
+                                        "tests/import_test_sample.csv")
+
+    def test_view(self):
+        response = self.app.get(reverse("accounts.transaction.import"),
+                                user=self.user)
+        assert response.status_code == 200
+        form = response.forms[1]
+        form["account_main"] = self.acct1.pk
+        form["filename"] = [self.sample_file]
+        response = form.submit()
+        assert response.status_code == 200
+        assert "Confirm Import Transaction" in response
+        form = response.forms[1]
+        form["form-0-account_debit"] = self.acct2.pk
+        form["form-1-account_debit"] = self.acct2.pk
+        response = form.submit().follow()
+        assert response.status_code == 200
+        assert "Successfully added 2 Transactions" in response
+
+    def test_validation(self):
+        response = self.app.get(reverse("accounts.transaction.import"),
+                                user=self.user)
+        assert response.status_code == 200
+        form = response.forms[1]
+        form["account_main"] = self.acct1.pk
+        response = form.submit()
+        assert response.status_code == 200
+        assert "is required" in response
+
+    def test_confirm_validation(self):
+        response = self.app.get(reverse("accounts.transaction.import"),
+                                user=self.user)
+        assert response.status_code == 200
+        form = response.forms[1]
+        form["account_main"] = self.acct1.pk
+        form["filename"] = [self.sample_file]
+        response = form.submit()
+        assert response.status_code == 200
+        assert "Confirm Import Transaction" in response
+        form = response.forms[1]
+        form["form-0-account_debit"] = self.acct2.pk
+        response = form.submit()
+        assert response.status_code == 200
+        assert "is required" in response
+
+    def test_isolation(self):
+        n_acct = account_factory(name="n_acct")
+        response = self.app.get(reverse("accounts.transaction.import"),
+                                user=self.user)
+        assert response.status_code == 200
+        assert n_acct.name not in response
+
+    def test_confirm_isolation(self):
+        n_acct = account_factory(name="n_acct")
+        response = self.app.get(reverse("accounts.transaction.import"),
+                                user=self.user)
+        assert response.status_code == 200
+        form = response.forms[1]
+        form["account_main"] = self.acct1.pk
+        form["filename"] = [self.sample_file]
+        response = form.submit()
+        assert response.status_code == 200
+        assert "Confirm Import Transaction" in response
+        assert n_acct.name not in response
