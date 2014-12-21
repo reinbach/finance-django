@@ -24,7 +24,7 @@ class AccountType(models.Model):
 
 class Account(models.Model):
     name = models.CharField(max_length=50, unique=True)
-    description = models.CharField(max_length=250)
+    description = models.CharField(max_length=250, blank=True)
     account_type = models.ForeignKey(AccountType)
     profile = models.ForeignKey(Profile)
 
@@ -72,7 +72,7 @@ class Transaction(models.Model):
                                        verbose_name="credit")
     amount = models.DecimalField(decimal_places=2, max_digits=8)
     summary = models.CharField(max_length=50)
-    description = models.CharField(max_length=250)
+    description = models.CharField(max_length=250, blank=True)
     date = models.DateField()
 
     class Meta:
