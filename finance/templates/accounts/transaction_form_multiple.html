@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% load bootstrap3 %}
+
+{% block page-content %}
+  <h1 class="page-header">Transactions</h1>
+
+  <h2 class="sub-header">Import Transactions</h2>
+  <div class="table-responsive">
+    <form method="post" action="{% url 'accounts.transaction.import.confirm' %}" role="form" class="form-inline">
+      {% csrf_token %}
+      {% bootstrap_form formset.management_form %}
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Debit</th>
+            <th>Credit</th>
+            <th>Amount</th>
+            <th>Summary</th>
+            <th>Date</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for form in formset %}
+            <tr>
+              <td>{{ forloop.counter }}</td>
+              <td>{% bootstrap_field form.account_debit layout="inline" %}</td>
+              <td>{% bootstrap_field form.account_credit layout="inline" %}</td>
+              <td>{% bootstrap_field form.amount layout="inline" %}</td>
+              <td>{% bootstrap_field form.summary layout="inline" %}</td>
+              <td>{% bootstrap_field form.date layout="inline" %}</td>
+              <td>{% bootstrap_field form.DELETE layout="inline" %}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% buttons %}
+        <input type="submit" class="btn btn-success" value="Import Transactions" />
+        <a href="{% url 'accounts.transaction.list' %}" class="btn btn-danger">Cancel</a>
+      {% endbuttons %}
+    </form>
+  </div>
+{% endblock page-content %}

@@ -7,7 +7,8 @@ from finance.accounts.views import (DashboardView, SettingsView,
                                     AccountDeleteView, TransactionView,
                                     TransactionAddView, TransactionEditView,
                                     TransactionDeleteView,
-                                    TransactionImportView)
+                                    TransactionImportView,
+                                    TransactionImportConfirmView)
 
 
 urlpatterns = patterns(
@@ -52,4 +53,7 @@ urlpatterns = patterns(
     url("^transaction/import/$",
         login_required(TransactionImportView.as_view()),
         name="accounts.transaction.import"),
+    url("^transaction/import/confirm/$",
+        login_required(TransactionImportConfirmView.as_view()),
+        name="accounts.transaction.import.confirm"),
 )

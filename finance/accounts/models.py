@@ -105,8 +105,8 @@ class TransactionsImport():
      - mark as duplicate
     """
 
-    def __init__(self, main_account_id, filename, *args, **kwargs):
-        self.main_account_id = main_account_id
+    def __init__(self, main_account_pk, filename, *args, **kwargs):
+        self.main_account_pk = main_account_pk
         self.filename = filename
         self.transactions = []
 
@@ -132,31 +132,28 @@ class TransactionsImport():
         """Set debit/credit accounts for transaction"""
         other_account_id = self.get_account(trx['summary'])
         if Decimal(trx['amount']) < 0:
-            trx['credit'] = self.main_account_id
-            trx['debit'] = other_account_id
+            trx['account_credit'] = self.main_account_pk
+            trx['account_debit'] = other_account_id
         else:
-            trx['debit'] = self.main_account_id
-            trx['credit'] = other_account_id
+            trx['account_debit'] = self.main_account_pk
+            trx['account_credit'] = other_account_id
         trx['amount'] = str(abs(Decimal(trx['amount'])))
 
     def get_account(self, summary):
         """Look for other side of transaction based on description"""
-        res = Transaction().query.filter(
-            Transaction.summary == summary).first()
+        res = Transaction.objects.filter(summary=summary).first()
 
         if res is None:
             return None
 
-        if res.account_debit_id == self.main_account_id:
-            return res.account_credit_id
-        return res.account_debit_id
+        if res.account_debit.pk == self.main_account_pk:
+            return res.account_credit.pk
+        return res.account_debit.pk
 
     def is_duplicate(self, trx):
         """Check whether transaction is a possible duplicate"""
-        return bool(Transaction.query.filter(
-            Transaction.summary == trx['summary'],
-            Transaction.amount == trx['amount'],
-            Transaction.date == datetime.datetime.strptime(
-                trx['date'], "%m/%d/%Y"
-            ).strftime("%Y-%m-%d")
+        return bool(Transaction.objects.filter(
+            summary=trx['summary'],
+            amount=trx['amount'],
+            date=datetime.datetime.strptime(trx['date'], "%m/%d/%Y")
         ).first())

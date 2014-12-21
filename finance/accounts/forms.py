@@ -1,5 +1,11 @@
+import uuid
+
 from django import forms
-from finance.accounts.models import AccountType
+from django.conf import settings
+from django.forms.formsets import formset_factory, BaseFormSet
+from finance.accounts.models import (AccountType, Transaction,
+                                     TransactionsImport)
+from finance.accounts.utils import get_account_choices
 
 
 class AccountTypeForm(forms.ModelForm):
@@ -18,8 +24,44 @@ class AccountTypeForm(forms.ModelForm):
 
 
 class TransactionImportForm(forms.Form):
+    account_main = forms.ChoiceField()
     filename = forms.FileField()
 
-    def process(self):
-        # TODO process the uploaded file and create transactions
-        pass
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop("user")
+        super(TransactionImportForm, self).__init__(*args, **kwargs)
+        self.fields["account_main"].choices = get_account_choices(self.user)
+
+    def process_file(self):
+        filename = "{0}/imports/{1}.csv".format(settings.MEDIA_ROOT,
+                                                uuid.uuid4())
+        with open(filename, "wb+") as destination:
+            for chunk in self.files["filename"].chunks():
+                destination.write(chunk)
+        parser = TransactionsImport(self.cleaned_data["account_main"],
+                                   filename)
+        parser.parse_file()
+        return parser.transactions
+
+
+class TransactionForm(forms.ModelForm):
+    class Meta:
+        model = Transaction
+        exclude = ["description"]
+
+
+class TransactionBaseFormSet(BaseFormSet):
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop("user")
+        super(TransactionBaseFormSet, self).__init__(*args, **kwargs)
+
+    def _construct_form(self, i, **kwargs):
+        form = super(TransactionBaseFormSet, self)._construct_form(i, **kwargs)
+        account_choices = get_account_choices(self.user)
+        form.fields["account_debit"].choices = account_choices
+        form.fields["account_credit"].choices = account_choices
+        return form
+
+
+TransactionFormSet = formset_factory(TransactionForm, can_delete=True, extra=0,
+                                     formset=TransactionBaseFormSet)

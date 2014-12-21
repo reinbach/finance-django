@@ -1,9 +1,14 @@
 from django.contrib import messages
 from django.core.urlresolvers import reverse_lazy
+from django.shortcuts import render_to_response
+from django.template import RequestContext
 from django.views.generic import (TemplateView, CreateView, UpdateView,
                                   DeleteView, ListView, FormView)
-from finance.accounts.forms import AccountTypeForm, TransactionImportForm
+from finance.accounts.forms import (AccountTypeForm, TransactionImportForm,
+                                    TransactionFormSet)
 from finance.accounts.models import AccountType, Account, Transaction
+from finance.accounts.utils import (get_account_choices,
+                                    get_account_type_choices)
 from finance.core.models import get_user_profile
 
 
@@ -98,10 +103,9 @@ class AccountAddView(CreateView):
 
     def get_form(self, form_class):
         form = super(AccountAddView, self).get_form(form_class)
-        profile = get_user_profile(self.request.user)
-        form.fields["account_type"].choices = [(x.pk, x.name) for
-                                               x in AccountType.objects.filter(
-                                                   profile=profile)]
+        form.fields["account_type"].choices = get_account_type_choices(
+            self.request.user
+        )
         return form
 
     def form_valid(self, form):
@@ -126,10 +130,9 @@ class AccountEditView(UpdateView):
 
     def get_form(self, form_class):
         form = super(AccountEditView, self).get_form(form_class)
-        profile = get_user_profile(self.request.user)
-        form.fields["account_type"].choices = [(x.pk, x.name) for
-                                               x in AccountType.objects.filter(
-                                                   profile=profile)]
+        form.fields["account_type"].choices = get_account_type_choices(
+            self.request.user
+        )
         return form
 
     def get_queryset(self):
@@ -182,10 +185,7 @@ class TransactionAddView(CreateView):
 
     def get_form(self, form_class):
         form = super(TransactionAddView, self).get_form(form_class)
-        profile = get_user_profile(self.request.user)
-        account_choices = [("", "-" * 9)] + [(x.pk, x.name) for x in
-                                             Account.objects.filter(
-                                                 profile=profile)]
+        account_choices = get_account_choices(self.request.user)
         form.fields["account_debit"].choices = account_choices
         form.fields["account_credit"].choices = account_choices
         return form
@@ -246,3 +246,43 @@ class TransactionImportView(FormView):
         kwargs = super(TransactionImportView, self).get_context_data(**kwargs)
         kwargs["page"] = "transactions"
         return kwargs
+
+    def get_form_kwargs(self):
+        kwargs = super(TransactionImportView, self).get_form_kwargs()
+        kwargs["user"] = self.request.user
+        return kwargs
+
+    def form_valid(self, form):
+        formset = TransactionFormSet(initial=form.process_file(),
+                                     user=self.request.user)
+        return render_to_response(
+            "accounts/transaction_form_multiple.html",
+            self.get_context_data(formset=formset),
+            context_instance=RequestContext(self.request)
+        )
+
+
+class TransactionImportConfirmView(FormView):
+    template_name = "accounts/transaction_form_multiple.html"
+    form_class = TransactionFormSet
+    success_url = reverse_lazy("accounts.transaction.list")
+
+    def get_form_kwargs(self):
+        kwargs = super(TransactionImportConfirmView, self).get_form_kwargs()
+        kwargs["user"] = self.request.user
+        return kwargs
+
+    def get_context_data(self, **kwargs):
+        kwargs = super(TransactionImportConfirmView,
+                       self).get_context_data(**kwargs)
+        kwargs["page"] = "transactions"
+        return kwargs
+
+    def form_valid(self, form):
+        for f in form:
+            f.save()
+        messages.success(self.request,
+                         "Successfully added {0} Transactions".format(
+                             len(form)
+                         ))
+        return super(TransactionImportConfirmView, self).form_valid(form)
