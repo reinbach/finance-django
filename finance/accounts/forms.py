@@ -4,8 +4,9 @@ from django import forms
 from django.conf import settings
 from django.forms.formsets import formset_factory, BaseFormSet
 from finance.accounts.models import (AccountType, Transaction,
-                                     TransactionsImport)
-from finance.accounts.utils import get_account_choices
+                                     TransactionsImport, Account)
+from finance.accounts.utils import (get_account_choices,
+                                    get_account_type_choices)
 
 
 class AccountTypeForm(forms.ModelForm):
@@ -21,6 +22,16 @@ class AccountTypeForm(forms.ModelForm):
                     pk=self.instance.pk
             ).exists():
                 raise forms.ValidationError("Name needs to be unique")
+
+
+class AccountForm(forms.ModelForm):
+    class Meta:
+        model = Account
+        fields = ["name", "description", "account_type"]
+
+    def __init__(self, user, *args, **kwargs):
+        super(AccountForm, self).__init__(*args, **kwargs)
+        self.fields["account_type"].choices = get_account_type_choices(user)
 
 
 class TransactionImportForm(forms.Form):

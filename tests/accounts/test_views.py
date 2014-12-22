@@ -1,4 +1,5 @@
 import datetime
+import json
 import os
 
 from django.conf import settings
@@ -231,6 +232,42 @@ class TestAccountAddView(BaseWebTest):
         response = form.submit()
         assert response.status_code == 200
         assert "Account with this Name already exists" in response
+
+
+class TestAccountAddAjaxView(BaseWebTest):
+    csrf_checks = False
+
+    def test_view(self):
+        acct_type = account_type_factory(profile=self.profile)
+        data = {
+            "name": "acct1",
+            "account_type": acct_type.pk,
+        }
+        response = self.app.post(reverse("accounts.account.add"), data,
+                                 user=self.user, xhr=True)
+        assert response.status_code == 200
+        assert Account.objects.filter(name="acct1").exists() is True
+        acct = Account.objects.get(name="acct1")
+        res = json.loads(response.body)
+        assert res["new_pk"] == acct.pk
+        assert '<option value="{0}">- acct1</option>'.format(
+            acct.pk
+        ) in res["result"]
+        assert '<option value="">{0}</option>'.format(
+            acct_type.name
+        ) in res["result"]
+
+    def test_validation(self):
+        data = {
+            "name": "acct1",
+        }
+        response = self.app.post(reverse("accounts.account.add"), data,
+                                 user=self.user, xhr=True)
+        assert response.status_code == 200
+        assert Account.objects.filter(name="acct1").exists() is False
+        res = json.loads(response.body)
+        assert "new_pk" not in res.keys()
+        assert "is required" in res["result"]
 
 
 class TestAccountEditView(BaseWebTest):

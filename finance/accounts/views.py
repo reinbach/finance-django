@@ -1,11 +1,13 @@
 from django.contrib import messages
 from django.core.urlresolvers import reverse_lazy
+from django.http import JsonResponse
 from django.shortcuts import render_to_response
 from django.template import RequestContext
+from django.template.loader import render_to_string
 from django.views.generic import (TemplateView, CreateView, UpdateView,
                                   DeleteView, ListView, FormView)
 from finance.accounts.forms import (AccountTypeForm, TransactionImportForm,
-                                    TransactionFormSet)
+                                    TransactionFormSet, AccountForm)
 from finance.accounts.models import AccountType, Account, Transaction
 from finance.accounts.utils import (get_account_choices,
                                     get_account_type_choices)
@@ -111,11 +113,24 @@ class AccountAddView(CreateView):
     def form_valid(self, form):
         form.instance.profile = get_user_profile(self.request.user)
         response = super(AccountAddView, self).form_valid(form)
+        if self.request.is_ajax():
+            options = get_account_choices(self.request.user)
+            return JsonResponse(
+                {"result": render_to_string("options.html",
+                                            {"options": options}),
+                 "new_pk": self.object.pk}
+            )
         messages.success(self.request,
                          u"Successfully added Account {0}".format(
                              form.cleaned_data["name"]
                          ))
         return response
+
+    def form_invalid(self, form):
+        if self.request.is_ajax():
+            return JsonResponse({"result": render_to_string("form.html",
+                                                            {"form": form})})
+        return super(AccountAddView, self).form_invalid(form)
 
 
 class AccountEditView(UpdateView):
@@ -255,9 +270,10 @@ class TransactionImportView(FormView):
     def form_valid(self, form):
         formset = TransactionFormSet(initial=form.process_file(),
                                      user=self.request.user)
+        form_account = AccountForm(user=self.request.user)
         return render_to_response(
             "accounts/transaction_import_confirm.html",
-            self.get_context_data(form=formset),
+            self.get_context_data(form=formset, form_account=form_account),
             context_instance=RequestContext(self.request)
         )
 
@@ -276,6 +292,7 @@ class TransactionImportConfirmView(FormView):
         kwargs = super(TransactionImportConfirmView,
                        self).get_context_data(**kwargs)
         kwargs["page"] = "transactions"
+        kwargs["form_account"] = AccountForm(user=self.request.user)
         return kwargs
 
     def form_valid(self, form):
