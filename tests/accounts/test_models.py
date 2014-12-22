@@ -168,5 +168,5 @@ class TestTransactionsImport():
         t = TransactionsImport(acct.pk, self.TEST_FILE)
         t.parse_file()
         assert len(t.transactions) == 2
-        assert t.transactions[0]["duplicate"] is True
-        assert t.transactions[1]["duplicate"] is False
+        assert t.transactions[0]["DELETE"] is True
+        assert t.transactions[1]["DELETE"] is False

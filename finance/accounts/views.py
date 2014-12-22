@@ -279,10 +279,13 @@ class TransactionImportConfirmView(FormView):
         return kwargs
 
     def form_valid(self, form):
+        import_trx_count = 0
         for f in form:
-            f.save()
+            if not f.cleaned_data["DELETE"]:
+                f.save()
+                import_trx_count += 1
         messages.success(self.request,
                          "Successfully added {0} Transactions".format(
-                             len(form)
+                             import_trx_count
                          ))
         return super(TransactionImportConfirmView, self).form_valid(form)

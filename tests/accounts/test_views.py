@@ -556,3 +556,21 @@ class TestTransactionImportView(BaseWebTest):
         assert response.status_code == 200
         assert "Confirm Import Transaction" in response
         assert n_acct.name not in response
+
+    def test_duplicate(self):
+        response = self.app.get(reverse("accounts.transaction.import"),
+                                user=self.user)
+        assert response.status_code == 200
+        form = response.forms[1]
+        form["account_main"] = self.acct1.pk
+        form["filename"] = [self.sample_file]
+        response = form.submit()
+        assert response.status_code == 200
+        assert "Confirm Import Transaction" in response
+        form = response.forms[1]
+        form["form-0-account_debit"] = self.acct2.pk
+        form["form-1-account_debit"] = self.acct2.pk
+        form["form-1-DELETE"] = True
+        response = form.submit().follow()
+        assert response.status_code == 200
+        assert "Successfully added 1 Transactions" in response

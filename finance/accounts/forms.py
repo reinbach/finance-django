@@ -60,6 +60,7 @@ class TransactionBaseFormSet(BaseFormSet):
         account_choices = get_account_choices(self.user)
         form.fields["account_debit"].choices = account_choices
         form.fields["account_credit"].choices = account_choices
+        form.fields["DELETE"].label = "Duplicate"
         return form
 
 

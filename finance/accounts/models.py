@@ -28,6 +28,9 @@ class Account(models.Model):
     account_type = models.ForeignKey(AccountType)
     profile = models.ForeignKey(Profile)
 
+    class Meta:
+        ordering = ["name"]
+
     def __unicode__(self):
         return self.name
 
@@ -117,7 +120,7 @@ class TransactionsImport():
             for trx_import in filereader:
                 trx = self.map_fields(trx_import)
                 self.set_accounts(trx)
-                trx['duplicate'] = self.is_duplicate(trx)
+                trx['DELETE'] = self.is_duplicate(trx)
                 self.transactions.append(trx)
 
     def map_fields(self, trx_import):
