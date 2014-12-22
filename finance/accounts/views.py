@@ -256,14 +256,14 @@ class TransactionImportView(FormView):
         formset = TransactionFormSet(initial=form.process_file(),
                                      user=self.request.user)
         return render_to_response(
-            "accounts/transaction_form_multiple.html",
+            "accounts/transaction_import_confirm.html",
             self.get_context_data(form=formset),
             context_instance=RequestContext(self.request)
         )
 
 
 class TransactionImportConfirmView(FormView):
-    template_name = "accounts/transaction_form_multiple.html"
+    template_name = "accounts/transaction_import_confirm.html"
     form_class = TransactionFormSet
     success_url = reverse_lazy("accounts.transaction.list")
 
