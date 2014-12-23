@@ -27,6 +27,9 @@ class Account(models.Model):
     description = models.CharField(max_length=250, blank=True)
     account_type = models.ForeignKey(AccountType)
     profile = models.ForeignKey(Profile)
+    parent = models.ForeignKey('Account', null=True, blank=True,
+                               limit_choices_to={"is_category": True})
+    is_category = models.BooleanField(default=False)
 
     class Meta:
         ordering = ["name"]
@@ -47,6 +50,9 @@ class Account(models.Model):
         balance = self.get_total(self.debit.all()) - self.get_total(
             self.credit.all())
         return balance
+
+    def subaccounts(self):
+        return Account.objects.filter(parent=self)
 
     def transactions(self):
         """Get all transactions associated with this account

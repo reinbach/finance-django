@@ -161,24 +161,27 @@ class TestAccountTypeDeleteView(BaseWebTest):
 
 class TestAccountView(BaseWebTest):
     def test_view(self):
-        acct = account_factory(profile=self.profile)
+        acct1 = account_factory(profile=self.profile, parent=None)
+        acct2 = account_factory(profile=self.profile, parent=acct1)
         response = self.app.get(reverse("accounts.account.list"),
                                 user=self.user)
         assert response.status_code == 200
         assert '<h1 class="page-header">Accounts</h1>' in response
-        assert acct.name in response
+        assert acct1.name in response
+        assert acct2.name not in response
 
     def test_permission(self):
-        acct = account_factory(profile=self.profile)
+        acct = account_factory(profile=self.profile, parent=None)
         response = self.app.get(reverse("accounts.account.list"))
         assert response.status_code == 302
         assert '<h1 class="page-header">Accounts</h1>' not in response
         assert acct.name not in response
 
     def test_isolation(self):
-        acct1 = account_factory(profile=self.profile, name="acct1")
+        acct1 = account_factory(profile=self.profile, name="acct1",
+                                parent=None)
         profile = profile_factory()
-        acct2 = account_factory(profile=profile, name="acct2")
+        acct2 = account_factory(profile=profile, name="acct2", parent=None)
         response = self.app.get(reverse("accounts.account.list"),
                                 user=self.user)
         assert response.status_code == 200
