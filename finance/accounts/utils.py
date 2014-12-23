@@ -11,8 +11,8 @@ def get_account_type_choices(user):
 
 
 def get_account_choices(user):
-    options = Account.objects.filter(profile__user=user).order_by(
-        "account_type"
+    options = Account.objects.filter(profile__user=user).exclude(
+        parent__isnull=False
     )
     acct_type = None
     valid_options = []
@@ -20,5 +20,23 @@ def get_account_choices(user):
         if option.account_type != acct_type:
             acct_type = option.account_type
             valid_options.append(("", acct_type.name))
-        valid_options.append((option.pk, "- {0}".format(option.name)))
+        if option.is_category:
+            valid_options.append(("", "- {0}".format(option.name)))
+            valid_options = valid_options + get_suboptions(option, 1)
+        else:
+            valid_options.append((option.pk, "- {0}".format(option.name)))
     return BLANK_OPTION + valid_options
+
+
+def get_suboptions(account, level):
+    options = []
+    for option in account.subaccounts():
+        if option.is_category:
+            options.append(("", "{0} {1}".format("-" * (level + 1),
+                                                 option.name)))
+            new_level = level + 1
+            options = options + get_suboptions(option, new_level)
+        else:
+            options.append((option.pk, "{0} {1}".format("-" * (level + 1),
+                                                        option.name)))
+    return options

@@ -399,8 +399,10 @@ class TestTransactionView(BaseWebTest):
 class TestTransactionAddView(BaseWebTest):
     def setUp(self):
         super(TestTransactionAddView, self).setUp()
-        self.acct1 = account_factory(profile=self.profile)
-        self.acct2 = account_factory(profile=self.profile)
+        self.acct1 = account_factory(profile=self.profile, is_category=False,
+                                     parent=None)
+        self.acct2 = account_factory(profile=self.profile, is_category=False,
+                                     parent=None)
 
     def test_view(self):
         response = self.app.get(reverse("accounts.transaction.add"),
@@ -529,8 +531,10 @@ class TestTransactionDeleteView(BaseWebTest):
 class TestTransactionImportView(BaseWebTest):
     def setUp(self):
         super(TestTransactionImportView, self).setUp()
-        self.acct1 = account_factory(profile=self.profile)
-        self.acct2 = account_factory(profile=self.profile)
+        self.acct1 = account_factory(profile=self.profile, is_category=False,
+                                     parent=None)
+        self.acct2 = account_factory(profile=self.profile, is_category=False,
+                                     parent=None)
         self.sample_file = os.path.join(settings.BASE_DIR,
                                         "tests/import_test_sample.csv")
 
