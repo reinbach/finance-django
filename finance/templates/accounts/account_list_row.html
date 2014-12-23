@@ -4,9 +4,6 @@
   <td>
     {{ "-"|repeat:depth }}
     {{ account.name }}
-    {% if account.is_category %}
-      <button class="btn btn-default btn-xs">-</button>
-    {% endif %}
   </td>
   <td>{{ account.description }}</td>
   <td>{{ account.account_type.name }}</td>
