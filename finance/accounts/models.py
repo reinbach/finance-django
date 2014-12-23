@@ -3,7 +3,7 @@ import datetime
 
 from decimal import Decimal
 from django.db import models
-from django.db.models import Q
+from django.db.models import Q, Sum
 from finance.core.models import Profile
 
 
@@ -37,18 +37,21 @@ class Account(models.Model):
     def __unicode__(self):
         return self.name
 
-    def get_total(self, trx_list):
-        """Get the sum of the relevant transactions"""
-        total = 0
-        for trx in trx_list:
-            total += trx.amount
-        return total
-
-    @property
     def balance(self):
         """Current balance of account"""
-        balance = self.get_total(self.debit.all()) - self.get_total(
-            self.credit.all())
+        balance = 0
+        if self.is_category:
+            for acct in self.subaccounts():
+                balance += acct.balance()
+        else:
+            debit_total = self.debit.all().aggregate(
+                total=Sum("amount")
+            )["total"]
+            credit_total = self.credit.all().aggregate(
+                total=Sum("amount")
+            )["total"]
+            balance += debit_total if debit_total is not None else 0
+            balance -= credit_total if credit_total is not None else 0
         return balance
 
     def subaccounts(self):

@@ -23,27 +23,28 @@ class TestAccount():
         a = Account(name="acct", account_type=at)
         assert unicode(a) == "acct"
 
-    def test_get_total(self):
-        a1 = account_factory()
-        a2 = account_factory()
-        transaction_factory(account_debit=a1, account_credit=a2,
-                            amount="10.00")
-        transaction_factory(account_debit=a1, account_credit=a2, amount="5.00")
-        assert a1.get_total(a1.debit.all()) == 15.00
-        assert a1.get_total(a1.credit.all()) == 0
-        assert a2.get_total(a2.debit.all()) == 0
-        assert a2.get_total(a2.credit.all()) == 15.00
-
     def test_balance(self):
         a = account_factory()
         transaction_factory(account_debit=a, amount="5")
         transaction_factory(account_credit=a, amount="2.5")
         transaction_factory(account_debit=a, amount="15.15")
-        assert a.balance == Decimal("17.65")
+        assert a.balance() == Decimal("17.65")
 
     def test_balance_empty(self):
         a = account_factory()
-        assert a.balance == 0
+        assert a.balance() == 0
+
+    def test_balance_subaccounts(self):
+        acct1 = account_factory(parent=None, is_category=True)
+        acct2 = account_factory(parent=acct1, is_category=True)
+        acct3 = account_factory(parent=acct2, is_category=False)
+        acct4 = account_factory(parent=acct1, is_category=False)
+        transaction_factory(account_debit=acct3, amount="5.25")
+        transaction_factory(account_debit=acct3, amount="2.50")
+        transaction_factory(account_debit=acct4, amount="10.10")
+        transaction_factory(account_credit=acct4, amount="1.00")
+        assert acct1.balance() == Decimal("16.85")
+        assert acct2.balance() == Decimal("7.75")
 
     def test_transactions(self):
         a = account_factory()
@@ -58,6 +59,12 @@ class TestAccount():
         assert trxs[0] == (t1, Decimal("5.00"))
         assert trxs[1] == (t2, Decimal("2.50"))
         assert trxs[2] == (t3, Decimal("17.65"))
+
+    def test_subaccounts(self):
+        a = account_factory(name="acct1", parent=None)
+        b = account_factory(name="acct2", parent=a)
+        assert b in list(a.subaccounts())
+        assert list(b.subaccounts()) == []
 
 
 @pytest.mark.django_db
