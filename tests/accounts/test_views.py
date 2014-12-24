@@ -224,7 +224,7 @@ class TestAccountAddView(BaseWebTest):
 
     def test_name_uniqueness(self):
         acct_type = account_type_factory(profile=self.profile)
-        account_factory(name="acct1")
+        account_factory(name="acct1", account_type=acct_type)
         response = self.app.get(reverse("accounts.account.add"),
                                 user=self.user)
         assert response.status_code == 200
@@ -234,7 +234,7 @@ class TestAccountAddView(BaseWebTest):
         form["account_type"] = acct_type.pk
         response = form.submit()
         assert response.status_code == 200
-        assert "Account with this Name already exists" in response
+        assert "Account with this Name and Account type already exists" in response
 
 
 class TestAccountAddAjaxView(BaseWebTest):
@@ -313,16 +313,17 @@ class TestAccountEditView(BaseWebTest):
         assert response.status_code == 404
 
     def test_name_uniqueness(self):
-        account_factory(profile=self.profile, name="acct1")
-        acct = account_factory(profile=self.profile, name="acct2")
+        acct1 = account_factory(profile=self.profile, name="acct1")
+        acct2 = account_factory(profile=self.profile, name="acct2",
+                                account_type=acct1.account_type)
         response = self.app.get(reverse("accounts.account.edit",
-                                        args=[acct.pk]), user=self.user)
+                                        args=[acct2.pk]), user=self.user)
         assert response.status_code == 200
         form = response.forms[1]
         form["name"] = "acct1"
         response = form.submit()
         assert response.status_code == 200
-        assert "Account with this Name already exists" in response
+        assert "Account with this Name and Account type already exists" in response
 
 
 class TestAccountDeleteView(BaseWebTest):

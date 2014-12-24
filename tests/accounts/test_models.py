@@ -4,6 +4,7 @@ import pytest
 
 from decimal import Decimal
 from django.conf import settings
+from django_dynamic_fixture.ddf import BadDataError
 from finance.accounts.models import (Account, AccountType, Transaction,
                                      TransactionsImport)
 from tests.fixtures import (account_factory, account_type_factory,
@@ -65,6 +66,12 @@ class TestAccount():
         b = account_factory(name="acct2", parent=a)
         assert b in list(a.subaccounts())
         assert list(b.subaccounts()) == []
+
+    def test_uniqueness(self):
+        a = account_factory(name="acct1")
+        account_factory(name="acct1")
+        with pytest.raises(BadDataError):
+            account_factory(name="acct1", account_type=a.account_type)
 
 
 @pytest.mark.django_db

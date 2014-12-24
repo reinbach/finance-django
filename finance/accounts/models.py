@@ -23,7 +23,7 @@ class AccountType(models.Model):
 
 
 class Account(models.Model):
-    name = models.CharField(max_length=50, unique=True)
+    name = models.CharField(max_length=50)
     description = models.CharField(max_length=250, blank=True)
     account_type = models.ForeignKey(AccountType)
     profile = models.ForeignKey(Profile)
@@ -33,6 +33,7 @@ class Account(models.Model):
 
     class Meta:
         ordering = ["name"]
+        unique_together = ["name", "account_type"]
 
     def __unicode__(self):
         return self.name
