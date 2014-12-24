@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load bootstrap3 %}
+{% load staticfiles bootstrap3 %}
 
 {% block page-content %}
   <h1 class="page-header">Transactions</h1>
@@ -27,15 +27,11 @@
               <td>{{ forloop.counter }}</td>
               <td>
                 {% bootstrap_field f.account_debit layout="inline" %}
-                <button type="button" class="btn btn-default" data-toggle="modal" data-target="#accountAddModal" title="Add Account">
-                  +
-                </button>
+                {% include "accounts/account_add_modal_button.html" %}
               </td>
               <td>
                 {% bootstrap_field f.account_credit layout="inline" %}
-                <button type="button" class="btn btn-default" data-toggle="modal" data-target="#accountAddModal" title="Add Account">
-                  +
-                </button>
+                {% include "accounts/account_add_modal_button.html" %}
               </td>
               <td>{% bootstrap_field f.amount layout="inline" %}</td>
               <td>{% bootstrap_field f.summary layout="inline" %}</td>
@@ -52,57 +48,10 @@
     </form>
   </div>
 
-  <div class="modal fade" id="accountAddModal" tabindex="-1" role="dialog" aria-labelledby="accountAddModal" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <form method="post" action="{% url 'accounts.account.add' %}" role="form" id="account-form">
-          {% csrf_token %}
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-            <h4 class="modal-title" id="accountAddModalLabel">Add Account</h4>
-          </div>
-          <div class="modal-body" id="accountAddModalBody">
-            {% bootstrap_form form_account %}
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-            <button type="submit" class="btn btn-primary">Add Account</button>
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
+  {% include "accounts/account_add_modal.html" %}
+
 {% endblock page-content %}
 
 {% block page-js %}
-  <script>
-    $(function() {
-        var acctForm = $("#account-form");
-        acctForm.submit(function() {
-            $.ajax({
-                type: acctForm.attr("method"),
-                url: acctForm.attr("action"),
-                data: acctForm.serialize(),
-                success: function(data) {
-                    updateAccountOptions(data.result);
-                    $("#accountAddModal").modal("hide");
-                    // update all debit/credit with same summary value
-                },
-                error: function(data) {
-                    $("#accountAddModalBody").html(data.result);
-                }
-            });
-            return false;
-        });
-    });
-
-    function updateAccountOptions(options) {
-        $("select").each(function() {
-            var cur_value = $(this).val();
-            console.log("cur: " + cur_value);
-            $(this).html(options);
-            $(this).val(cur_value);
-        });
-    }
-  </script>
+  <script src="{% static 'js/accounts.js' %}"></script>
 {% endblock page-js %}

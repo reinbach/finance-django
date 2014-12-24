@@ -1,0 +1,22 @@
+{% load bootstrap3 %}
+
+<div class="modal fade" id="accountAddModal" tabindex="-1" role="dialog" aria-labelledby="accountAddModal" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form method="post" action="{% url 'accounts.account.add' %}" role="form" id="account-form">
+        {% csrf_token %}
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+          <h4 class="modal-title" id="accountAddModalLabel">Add Account</h4>
+        </div>
+        <div class="modal-body" id="accountAddModalBody">
+          {% bootstrap_form form_account %}
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          <button type="submit" class="btn btn-primary">Add Account</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
