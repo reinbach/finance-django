@@ -86,7 +86,7 @@ class AccountView(ListView):
         qs = super(AccountView, self).get_queryset()
         qs = qs.filter(profile__user=self.request.user).exclude(
             parent__isnull=False
-        )
+        ).order_by("account_type", "name")
         return qs
 
     def get_context_data(self, **kwargs):
@@ -199,6 +199,7 @@ class TransactionView(ListView):
 class TransactionAddView(CreateView):
     model = Transaction
     success_url = reverse_lazy("accounts.transaction.list")
+    fields = ["account_debit", "account_credit", "amount", "summary", "description", "date"]
 
     def get_form(self, form_class):
         form = super(TransactionAddView, self).get_form(form_class)
