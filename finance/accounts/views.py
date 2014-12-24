@@ -110,6 +110,8 @@ class AccountAddView(CreateView):
         form.fields["account_type"].choices = get_account_type_choices(
             self.request.user
         )
+        parent_account_choices = get_account_choices(self.request.user, True)
+        form.fields["parent"].choices = parent_account_choices
         return form
 
     def form_valid(self, form):
