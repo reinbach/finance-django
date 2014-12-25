@@ -23,7 +23,8 @@ def get_account_choices(user, categories_only=False):
             acct_type = option.account_type
             valid_options.append(("", acct_type.name))
         if option.is_category:
-            valid_options.append(("", "- {0}".format(option.name)))
+            pk = option.pk if categories_only else ""
+            valid_options.append((pk, "- {0}".format(option.name)))
             valid_options = valid_options + get_suboptions(option, 1,
                                                            categories_only)
         else:
@@ -38,7 +39,8 @@ def get_suboptions(account, level, categories_only):
         subaccounts = subaccounts.filter(is_category=True)
     for option in subaccounts:
         if option.is_category:
-            options.append(("", "{0} {1}".format("-" * (level + 1),
+            pk = option.pk if categories_only else ""
+            options.append((pk, "{0} {1}".format("-" * (level + 1),
                                                  option.name)))
             new_level = level + 1
             options = options + get_suboptions(option, new_level,

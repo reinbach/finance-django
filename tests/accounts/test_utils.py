@@ -50,7 +50,7 @@ class TestGetAccountChoices():
         choices = get_account_choices(profile.user, True)
         assert BLANK_OPTION[0] in choices
         assert ("", acct_type.name) in choices
-        assert ("", "- {0}".format(acct1.name)) in choices
+        assert (acct1.pk, "- {0}".format(acct1.name)) in choices
         assert (acct2.pk, "- {0}".format(acct2.name)) not in choices
 
     def test_valid_options_multiple(self):
@@ -106,7 +106,7 @@ class TestGetAccountChoices():
                                 is_category=False, parent=acct1)
         choices = get_account_choices(profile.user, True)
         assert BLANK_OPTION[0] in choices
-        assert ("", "- {0}".format(acct1.name)) in choices
-        assert ("", "-- {0}".format(acct2.name)) in choices
+        assert (acct1.pk, "- {0}".format(acct1.name)) in choices
+        assert (acct2.pk, "-- {0}".format(acct2.name)) in choices
         assert (acct3.pk, "--- {0}".format(acct3.name)) not in choices
         assert (acct4.pk, "-- {0}".format(acct4.name)) not in choices
