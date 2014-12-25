@@ -27,7 +27,8 @@ class AccountTypeForm(forms.ModelForm):
 class AccountForm(forms.ModelForm):
     class Meta:
         model = Account
-        fields = ["name", "description", "account_type"]
+        fields = ["name", "description", "account_type", "parent",
+                  "is_category"]
 
     def __init__(self, user, *args, **kwargs):
         super(AccountForm, self).__init__(*args, **kwargs)

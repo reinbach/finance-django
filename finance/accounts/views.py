@@ -152,6 +152,8 @@ class AccountEditView(UpdateView):
         form.fields["account_type"].choices = get_account_type_choices(
             self.request.user
         )
+        form.fields["parent"].choices = get_account_choices(self.request.user,
+                                                            True)
         return form
 
     def get_queryset(self):
