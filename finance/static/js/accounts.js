@@ -9,6 +9,7 @@ $(function() {
                 updateAccountOptions(data.result);
                 $("#accountAddModal").modal("hide");
                 // update all debit/credit with same summary value
+                // clear/reset modal values
             },
             error: function(data) {
                 $("#accountAddModalBody").html(data.result);
@@ -19,9 +20,8 @@ $(function() {
 });
 
 function updateAccountOptions(options) {
-    $("select").each(function() {
+    $("select[name!=account_type]").each(function() {
         var cur_value = $(this).val();
-        console.log("cur: " + cur_value);
         $(this).html(options);
         $(this).val(cur_value);
     });
