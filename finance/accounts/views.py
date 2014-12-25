@@ -86,7 +86,7 @@ class AccountView(ListView):
         qs = super(AccountView, self).get_queryset()
         qs = qs.filter(profile__user=self.request.user).exclude(
             parent__isnull=False
-        ).order_by("account_type", "name")
+        )
         return qs
 
     def get_context_data(self, **kwargs):

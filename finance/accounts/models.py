@@ -32,7 +32,7 @@ class Account(models.Model):
     is_category = models.BooleanField(default=False)
 
     class Meta:
-        ordering = ["name"]
+        ordering = ["account_type", "name"]
         unique_together = ["name", "account_type"]
 
     def __unicode__(self):
