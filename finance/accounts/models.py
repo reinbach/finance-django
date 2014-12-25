@@ -33,7 +33,6 @@ class Account(models.Model):
 
     class Meta:
         ordering = ["account_type", "name"]
-        unique_together = ["name", "account_type", "parent"]
 
     def __unicode__(self):
         return self.name

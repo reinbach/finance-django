@@ -67,12 +67,6 @@ class TestAccount():
         assert b in list(a.subaccounts())
         assert list(b.subaccounts()) == []
 
-    def test_uniqueness(self):
-        a = account_factory(name="acct1")
-        account_factory(name="acct1")
-        with pytest.raises(BadDataError):
-            account_factory(name="acct1", account_type=a.account_type)
-
 
 @pytest.mark.django_db
 class TestTransaction():
