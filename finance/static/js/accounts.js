@@ -17,6 +17,21 @@ $(function() {
         });
         return false;
     });
+
+    $("select[name!=account_type]").change(function() {
+        var new_value = $(this).val();
+        var row = $(this).parents("tr");
+        var summary_value = $(":input[name$='summary']", row).val()
+        $("tr ~ tr").each(function() {
+            if ($(":input[name$='summary']", this).val() == summary_value) {
+                $("select", this).each(function() {
+                    if ($(this).val() == "") {
+                        $(this).val(new_value);
+                    }
+                });
+            }
+        });
+    });
 });
 
 function updateAccountOptions(options) {
