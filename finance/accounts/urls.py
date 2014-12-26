@@ -42,6 +42,9 @@ urlpatterns = patterns(
     # transactions
     url("^transaction/list/$", login_required(TransactionView.as_view()),
         name="accounts.transaction.list"),
+    url("^transaction/list/(?P<pk>[\d]+)/$",
+        login_required(TransactionView.as_view()),
+        name="accounts.transaction.list.by_account"),
     url("^transaction/add/$", login_required(TransactionAddView.as_view()),
         name="accounts.transaction.add"),
     url("^transaction/edit/(?P<pk>\d+)/$",

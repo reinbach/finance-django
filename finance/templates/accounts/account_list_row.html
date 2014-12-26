@@ -3,7 +3,13 @@
 <tr>
   <td>
     {{ "-"|repeat:depth }}
-    {{ account.name }}
+    {% if account.is_category %}
+      <strong>{{ account.name }}</strong>
+    {% else %}
+      <a href="{% url 'accounts.transaction.list.by_account' account.pk %}">
+        {{ account.name }}
+      </a>
+    {% endif %}
   </td>
   <td>{{ account.description }}</td>
   <td>{{ account.account_type.name }}</td>

@@ -340,7 +340,7 @@ class TestTransactionView(BaseWebTest):
         response = self.app.get(reverse("accounts.transaction.list"),
                                 user=self.user)
         assert response.status_code == 200
-        assert '<h1 class="page-header">Transactions</h1>' in response
+        assert '<h1 class="page-header"> Transactions' in response
         assert self.acct1.name in response
         assert self.acct2.name in response
         assert "10.00" in response
@@ -348,7 +348,7 @@ class TestTransactionView(BaseWebTest):
     def test_permission(self):
         response = self.app.get(reverse("accounts.transaction.list"))
         assert response.status_code == 302
-        assert '<h1 class="page-header">Transaction</h1>' not in response
+        assert '<h1 class="page-header"> Transactions' not in response
 
     def test_isolation(self):
         transaction_factory(account_debit=self.acct1,
@@ -361,13 +361,28 @@ class TestTransactionView(BaseWebTest):
         response = self.app.get(reverse("accounts.transaction.list"),
                                 user=self.user)
         assert response.status_code == 200
-        assert '<h1 class="page-header">Transactions</h1>' in response
+        assert '<h1 class="page-header"> Transactions' in response
         assert self.acct1.name in response
         assert self.acct2.name in response
         assert "10.00" in response
         assert acct1.name not in response
         assert acct2.name not in response
         assert "5.00" not in response
+
+    def test_for_account(self):
+        acct3 = account_factory(profile=self.profile, name="acct3")
+        transaction_factory(account_debit=self.acct1,
+                            account_credit=self.acct2, amount="10.00")
+        response = self.app.get(reverse("accounts.transaction.list.by_account",
+                                        args=[self.acct1.pk]),
+                                user=self.user)
+        assert response.status_code == 200
+        assert '<h1 class="page-header"> Transactions: {0}'.format(
+            self.acct1.name) in response
+        assert self.acct1.name in response
+        assert self.acct2.name in response
+        assert acct3.name not in response
+        assert "10.00" in response
 
 
 class TestTransactionAddView(BaseWebTest):

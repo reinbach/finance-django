@@ -1,7 +1,9 @@
 {% extends "base.html" %}
 
 {% block page-content %}
-  <h1 class="page-header">Transactions</h1>
+  <h1 class="page-header">
+    Transactions{% if account %}: {{ account }}{% endif %}
+  </h1>
 
   <div class="table-responsive">
     <table class="table table-striped">

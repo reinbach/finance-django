@@ -1,7 +1,8 @@
 from django.contrib import messages
 from django.core.urlresolvers import reverse_lazy
+from django.db.models import Q
 from django.http import JsonResponse
-from django.shortcuts import render_to_response
+from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
 from django.template.loader import render_to_string
 from django.views.generic import (TemplateView, CreateView, UpdateView,
@@ -195,18 +196,25 @@ class TransactionView(ListView):
     def get_queryset(self):
         qs = super(TransactionView, self).get_queryset()
         qs = qs.filter(account_debit__profile__user=self.request.user)
+        if "pk" in self.kwargs:
+            qs = qs.filter(Q(account_debit__pk=self.kwargs["pk"]) |
+                           Q(account_credit__pk=self.kwargs["pk"]))
         return qs
 
     def get_context_data(self, **kwargs):
         kwargs = super(TransactionView, self).get_context_data(**kwargs)
         kwargs["page"] = "transactions"
+        if "pk" in self.kwargs:
+            kwargs["account"] = get_object_or_404(Account,
+                                                  pk=self.kwargs["pk"])
         return kwargs
 
 
 class TransactionAddView(CreateView):
     model = Transaction
     success_url = reverse_lazy("accounts.transaction.list")
-    fields = ["account_debit", "account_credit", "amount", "summary", "description", "date"]
+    fields = ["account_debit", "account_credit", "amount", "summary",
+              "description", "date"]
 
     def get_form(self, form_class):
         form = super(TransactionAddView, self).get_form(form_class)
