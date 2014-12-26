@@ -9,7 +9,7 @@ $(function() {
                 updateAccountOptions(data.result);
                 $("#accountAddModal").modal("hide");
                 // update all debit/credit with same summary value
-                $(":input", acctForm).val("");
+                $(":input[type!='hidden']", acctForm).val("");
                 $(":input", acctForm).attr("checked", false);
             },
             error: function(data) {
