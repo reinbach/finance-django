@@ -118,10 +118,13 @@ class AccountAddView(CreateView):
         form.instance.profile = get_user_profile(self.request.user)
         response = super(AccountAddView, self).form_valid(form)
         if self.request.is_ajax():
-            options = get_account_choices(self.request.user)
+            account_options = get_account_choices(self.request.user)
+            parent_options = get_account_choices(self.request.user, True)
             return JsonResponse(
                 {"result": render_to_string("options.html",
-                                            {"options": options}),
+                                            {"options": account_options}),
+                 "parent": render_to_string("options.html",
+                                            {"options": parent_options}),
                  "new_pk": self.object.pk}
             )
         messages.success(self.request,

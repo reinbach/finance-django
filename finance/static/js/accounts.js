@@ -11,6 +11,7 @@ $(function() {
                 // update all debit/credit with same summary value
                 $(":input[type!='hidden']", acctForm).val("");
                 $(":input", acctForm).attr("checked", false);
+                $("#id_parent", acctForm).html(data.parent);
             },
             error: function(data) {
                 $("#accountAddModalBody").html(data.result);

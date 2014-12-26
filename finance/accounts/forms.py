@@ -33,6 +33,7 @@ class AccountForm(forms.ModelForm):
     def __init__(self, user, *args, **kwargs):
         super(AccountForm, self).__init__(*args, **kwargs)
         self.fields["account_type"].choices = get_account_type_choices(user)
+        self.fields["parent"].choices = get_account_choices(user, True)
 
 
 class TransactionImportForm(forms.Form):
