@@ -9,7 +9,7 @@
     <table class="table table-striped">
       <thead>
         <tr>
-          <th>#</th>
+          <th>Date</th>
           <th>Debit</th>
           <th>Credit</th>
           <th>Amount</th>
@@ -21,7 +21,7 @@
       <tbody>
         {% for trx in object_list %}
           <tr>
-            <td>{{ forloop.counter }}</td>
+            <td>{{ trx.date }}</td>
             <td>{{ trx.account_debit }}</td>
             <td>{{ trx.account_credit }}</td>
             <td class="text-right">{{ trx.amount|floatformat:"2" }}</td>
