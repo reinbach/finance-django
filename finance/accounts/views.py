@@ -243,6 +243,13 @@ class TransactionEditView(UpdateView):
         qs = qs.filter(account_debit__profile__user=self.request.user)
         return qs
 
+    def get_form(self, form_class):
+        form = super(TransactionEditView, self).get_form(form_class)
+        account_choices = get_account_choices(self.request.user)
+        form.fields["account_debit"].choices = account_choices
+        form.fields["account_credit"].choices = account_choices
+        return form
+
     def get_context_data(self, **kwargs):
         kwargs = super(TransactionEditView, self).get_context_data(**kwargs)
         kwargs["page"] = "transactions"

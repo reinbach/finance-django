@@ -435,8 +435,8 @@ class TestTransactionAddView(BaseWebTest):
 class TestTransactionEditView(BaseWebTest):
     def setUp(self):
         super(TestTransactionEditView, self).setUp()
-        self.acct1 = account_factory(profile=self.profile)
-        self.acct2 = account_factory(profile=self.profile)
+        self.acct1 = account_factory(profile=self.profile, parent=None)
+        self.acct2 = account_factory(profile=self.profile, parent=None)
 
     def test_view(self):
         trx = transaction_factory(account_debit=self.acct1,
