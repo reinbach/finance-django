@@ -1,4 +1,5 @@
 from django.contrib import messages
+from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.core.urlresolvers import reverse_lazy, reverse
 from django.db.models import Q
 from django.http import JsonResponse
@@ -207,6 +208,16 @@ class TransactionView(ListView):
         if "pk" in self.kwargs:
             kwargs["account"] = get_object_or_404(Account,
                                                   pk=self.kwargs["pk"])
+        paginator = Paginator(kwargs["object_list"], 25)
+        page = self.request.GET.get("page")
+        try:
+            trxs = paginator.page(page)
+        except PageNotAnInteger:
+            trxs = paginator.page(1)
+        except EmptyPage:
+            trxs = paginator.page(paginator.num_pages)
+        kwargs["trxs"] = trxs
+
         return kwargs
 
 

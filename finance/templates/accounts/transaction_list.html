@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load bootstrap3 %}
 
 {% block page-content %}
   <h1 class="page-header">
@@ -6,6 +7,10 @@
   </h1>
 
   <div class="table-responsive">
+    <div class="col-md-12 text-right">
+      {% bootstrap_pagination trxs %}
+    </div>
+
     <table class="table table-striped">
       <thead>
         <tr>
@@ -19,7 +24,7 @@
         </tr>
       </thead>
       <tbody>
-        {% for trx in object_list %}
+        {% for trx in trxs %}
           <tr>
             <td>{{ trx.date }}</td>
             <td>{{ trx.account_debit }}</td>
@@ -55,14 +60,17 @@
         {% endfor %}
       </tbody>
     </table>
-    <p>
+
+    <div class="col-md-6">
       <a href="{% url 'accounts.transaction.add' %}" class="btn btn-default">
         Add Transaction
       </a>
       <a href="{% url 'accounts.transaction.import' %}" class="btn btn-default">
         Import Transactions
       </a>
-
-    </p>
+    </div>
+    <div class="col-md-6 text-right">
+      {% bootstrap_pagination trxs %}
+    </div>
   </div>
 {% endblock page-content %}
