@@ -451,6 +451,26 @@ class TestTransactionEditView(BaseWebTest):
         assert "Successfully updated Transaction" in response
         updated_trx = Transaction.objects.get(pk=trx.pk)
         assert updated_trx.amount == Decimal("10.00")
+        assert '<h1 class="page-header"> Transactions' in response
+
+    def test_redirect(self):
+        trx = transaction_factory(account_debit=self.acct1,
+                                  account_credit=self.acct2, amount="10.00")
+        response = self.app.get("{0}?next={1}".format(
+            reverse("accounts.transaction.edit", args=[trx.pk]),
+            self.acct1.pk
+        ), user=self.user)
+        assert response.status_code == 200
+        form = response.forms[1]
+        form["amount"] = "10"
+        response = form.submit().follow()
+        assert response.status_code == 200
+        assert "Successfully updated Transaction" in response
+        updated_trx = Transaction.objects.get(pk=trx.pk)
+        assert updated_trx.amount == Decimal("10.00")
+        assert '<h1 class="page-header"> Transactions: {0}'.format(
+            self.acct1.name
+        ) in response
 
     def test_permissions(self):
         trx = transaction_factory(account_debit=self.acct1,

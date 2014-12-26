@@ -1,5 +1,5 @@
 from django.contrib import messages
-from django.core.urlresolvers import reverse_lazy
+from django.core.urlresolvers import reverse_lazy, reverse
 from django.db.models import Q
 from django.http import JsonResponse
 from django.shortcuts import render_to_response, get_object_or_404
@@ -237,6 +237,12 @@ class TransactionAddView(CreateView):
 class TransactionEditView(UpdateView):
     model = Transaction
     success_url = reverse_lazy("accounts.transaction.list")
+
+    def get_success_url(self):
+        if "next" in self.request.GET:
+            return reverse("accounts.transaction.list.by_account",
+                           args=[self.request.GET["next"]])
+        return super(TransactionEditView, self).get_success_url()
 
     def get_queryset(self):
         qs = super(TransactionEditView, self).get_queryset()

@@ -28,7 +28,7 @@
             <td>{{ trx.summary }}</td>
             <td>{{ trx.description }}</td>
             <td>
-              <a href="{% url 'accounts.transaction.edit' trx.pk %}" class="btn btn-sm btn-default">Edit</a>
+              <a href="{% url 'accounts.transaction.edit' trx.pk %}{% if account %}?next={{ account.pk }}{% endif %}" class="btn btn-sm btn-default">Edit</a>
               <button type="button" class="btn btn-sm btn-danger" data-toggle="modal" data-target="#trxModalDelete{{ trx.pk }}">Delete</button>
               <div class="modal fade" id="trxModalDelete{{ trx.pk }}" tabindex="-1" role="dialog" aria-labelledby="trxModalDeleteLabel{{ trx.pk }}" aria-hidden="true">
                 <div class="modal-dialog">
