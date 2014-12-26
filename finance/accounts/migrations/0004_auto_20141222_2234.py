@@ -24,7 +24,8 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='account',
             name='parent',
-            field=models.ForeignKey(blank=True, to='accounts.Account', null=True),
+            field=models.ForeignKey(blank=True, to='accounts.Account',
+                                    null=True),
             preserve_default=True,
         ),
         migrations.AlterField(
@@ -36,13 +37,17 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='transaction',
             name='account_credit',
-            field=models.ForeignKey(related_name='credit', verbose_name=b'credit', to='accounts.Account'),
+            field=models.ForeignKey(related_name='credit',
+                                    verbose_name=b'credit',
+                                    to='accounts.Account'),
             preserve_default=True,
         ),
         migrations.AlterField(
             model_name='transaction',
             name='account_debit',
-            field=models.ForeignKey(related_name='debit', verbose_name=b'debit', to='accounts.Account'),
+            field=models.ForeignKey(related_name='debit',
+                                    verbose_name=b'debit',
+                                    to='accounts.Account'),
             preserve_default=True,
         ),
         migrations.AlterField(

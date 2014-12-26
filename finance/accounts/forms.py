@@ -52,7 +52,7 @@ class TransactionImportForm(forms.Form):
             for chunk in self.files["filename"].chunks():
                 destination.write(chunk)
         parser = TransactionsImport(self.cleaned_data["account_main"],
-                                   filename)
+                                    filename)
         parser.parse_file()
         return parser.transactions
 

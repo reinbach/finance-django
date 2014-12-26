@@ -278,7 +278,7 @@ class TransactionDeleteView(DeleteView):
 
     def post(self, request, *args, **kwargs):
         response = super(TransactionDeleteView, self).post(request, *args,
-                                                       **kwargs)
+                                                           **kwargs)
         messages.success(request, u"Successfully deleted Transaction")
         return response
 

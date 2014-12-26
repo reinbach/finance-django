@@ -4,7 +4,6 @@ import pytest
 
 from decimal import Decimal
 from django.conf import settings
-from django_dynamic_fixture.ddf import BadDataError
 from finance.accounts.models import (Account, AccountType, Transaction,
                                      TransactionsImport)
 from tests.fixtures import (account_factory, account_type_factory,
@@ -155,7 +154,7 @@ class TestTransactionsImport():
 
     def test_map_field(self):
         trx_import = {"Post Date": "2010-01-01", "Description": "sum",
-        "Amount": "15.25"}
+                      "Amount": "15.25"}
         acct1 = account_factory()
         t = TransactionsImport(acct1.pk, self.TEST_FILE)
         trx = t.map_fields(trx_import)
