@@ -1,0 +1,40 @@
+{% load bootstrap3 %}
+
+{% csrf_token %}
+{% bootstrap_form form.management_form %}
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Debit</th>
+      <th>Credit</th>
+      <th>Amount</th>
+      <th>Summary</th>
+      <th>Date</th>
+      {% if f.DELETE %}
+        <th>Action</th>
+      {% endif %}
+    </tr>
+  </thead>
+  <tbody>
+    {% for f in form %}
+    <tr>
+      <td>{{ forloop.counter }}</td>
+      <td>
+        {% bootstrap_field f.account_debit layout="inline" %}
+        {% include "accounts/account_add_modal_button.html" %}
+      </td>
+      <td>
+        {% bootstrap_field f.account_credit layout="inline" %}
+        {% include "accounts/account_add_modal_button.html" %}
+      </td>
+      <td>{% bootstrap_field f.amount layout="inline" %}</td>
+      <td>{% bootstrap_field f.summary layout="inline" %}</td>
+      <td>{% bootstrap_field f.date layout="inline" %}</td>
+      {% if f.DELETE %}
+        <td>{% bootstrap_field f.DELETE layout="inline" %}</td>
+      {% endif %}
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>

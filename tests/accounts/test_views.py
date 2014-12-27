@@ -398,15 +398,14 @@ class TestTransactionAddView(BaseWebTest):
                                 user=self.user)
         assert response.status_code == 200
         form = response.forms[1]
-        form["account_debit"] = self.acct1.pk
-        form["account_credit"] = self.acct2.pk
-        form["amount"] = "10.00"
-        form["summary"] = "short"
-        form["description"] = "desc"
-        form["date"] = datetime.date(2010, 1, 1)
+        form["form-0-account_debit"] = self.acct1.pk
+        form["form-0-account_credit"] = self.acct2.pk
+        form["form-0-amount"] = "10.00"
+        form["form-0-summary"] = "short"
+        form["form-0-date"] = datetime.date(2010, 1, 1)
         response = form.submit().follow()
         assert response.status_code == 200
-        assert "Successfully added Transaction" in response
+        assert "Successfully added 1 Transaction(s)" in response
         assert Transaction.objects.filter(
             account_debit=self.acct1,
             account_credit=self.acct2,
@@ -422,11 +421,10 @@ class TestTransactionAddView(BaseWebTest):
                                 user=self.user)
         assert response.status_code == 200
         form = response.forms[1]
-        form["account_credit"] = self.acct2.pk
-        form["amount"] = "10.00"
-        form["summary"] = "short"
-        form["description"] = "desc"
-        form["date"] = datetime.date(2010, 1, 1)
+        form["form-0-account_credit"] = self.acct2.pk
+        form["form-0-amount"] = "10.00"
+        form["form-0-summary"] = "short"
+        form["form-0-date"] = datetime.date(2010, 1, 1)
         response = form.submit()
         assert response.status_code == 200
         assert "is required" in response

@@ -9,7 +9,8 @@ from django.template.loader import render_to_string
 from django.views.generic import (TemplateView, CreateView, UpdateView,
                                   DeleteView, ListView, FormView)
 from finance.accounts.forms import (AccountTypeForm, TransactionImportForm,
-                                    TransactionFormSet, AccountForm)
+                                    TransactionFormSet, AccountForm,
+                                    TransactionImportFormSet)
 from finance.accounts.models import AccountType, Account, Transaction
 from finance.accounts.utils import (get_account_choices,
                                     get_account_type_choices)
@@ -221,27 +222,33 @@ class TransactionView(ListView):
         return kwargs
 
 
-class TransactionAddView(CreateView):
-    model = Transaction
+class TransactionAddView(FormView):
+    template_name = "accounts/transaction_add.html"
+    form_class = TransactionFormSet
     success_url = reverse_lazy("accounts.transaction.list")
-    fields = ["account_debit", "account_credit", "amount", "summary",
-              "description", "date"]
 
-    def get_form(self, form_class):
-        form = super(TransactionAddView, self).get_form(form_class)
-        account_choices = get_account_choices(self.request.user)
-        form.fields["account_debit"].choices = account_choices
-        form.fields["account_credit"].choices = account_choices
-        return form
+    def get_form_kwargs(self):
+        kwargs = super(TransactionAddView, self).get_form_kwargs()
+        kwargs["user"] = self.request.user
+        return kwargs
 
     def get_context_data(self, **kwargs):
         kwargs = super(TransactionAddView, self).get_context_data(**kwargs)
         kwargs["page"] = "transactions"
+        kwargs["form_account"] = AccountForm(user=self.request.user)
         return kwargs
 
     def form_valid(self, form):
+        added_trx_count = 0
+        for f in form:
+            if f.cleaned_data:
+                f.save()
+                added_trx_count += 1
         response = super(TransactionAddView, self).form_valid(form)
-        messages.success(self.request, u"Successfully added Transaction")
+        messages.success(self.request,
+                         u"Successfully added {0} Transaction(s)".format(
+                             added_trx_count
+                         ))
         return response
 
 
@@ -310,8 +317,8 @@ class TransactionImportView(FormView):
         return kwargs
 
     def form_valid(self, form):
-        formset = TransactionFormSet(initial=form.process_file(),
-                                     user=self.request.user)
+        formset = TransactionImportFormSet(initial=form.process_file(),
+                                           user=self.request.user)
         form_account = AccountForm(user=self.request.user)
         return render_to_response(
             "accounts/transaction_import_confirm.html",
@@ -322,7 +329,7 @@ class TransactionImportView(FormView):
 
 class TransactionImportConfirmView(FormView):
     template_name = "accounts/transaction_import_confirm.html"
-    form_class = TransactionFormSet
+    form_class = TransactionImportFormSet
     success_url = reverse_lazy("accounts.transaction.list")
 
     def get_form_kwargs(self):

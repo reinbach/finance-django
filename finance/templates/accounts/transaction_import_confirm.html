@@ -7,40 +7,7 @@
   <h2 class="sub-header">Confirm Import Transactions</h2>
   <div class="table-responsive">
     <form method="post" action="{% url 'accounts.transaction.import.confirm' %}" role="form" class="form-inline">
-      {% csrf_token %}
-      {% bootstrap_form form.management_form %}
-      <table class="table table-striped">
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Debit</th>
-            <th>Credit</th>
-            <th>Amount</th>
-            <th>Summary</th>
-            <th>Date</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for f in form %}
-            <tr>
-              <td>{{ forloop.counter }}</td>
-              <td>
-                {% bootstrap_field f.account_debit layout="inline" %}
-                {% include "accounts/account_add_modal_button.html" %}
-              </td>
-              <td>
-                {% bootstrap_field f.account_credit layout="inline" %}
-                {% include "accounts/account_add_modal_button.html" %}
-              </td>
-              <td>{% bootstrap_field f.amount layout="inline" %}</td>
-              <td>{% bootstrap_field f.summary layout="inline" %}</td>
-              <td>{% bootstrap_field f.date layout="inline" %}</td>
-              <td>{% bootstrap_field f.DELETE layout="inline" %}</td>
-            </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+      {% include "accounts/transaction_formset.html" %}
       {% buttons %}
         <input type="submit" class="btn btn-success" value="Import Transactions" />
         <a href="{% url 'accounts.transaction.list' %}" class="btn btn-danger">Cancel</a>
@@ -54,4 +21,22 @@
 
 {% block page-js %}
   <script src="{% static 'js/accounts.js' %}"></script>
+  <script>
+    $(function() {
+        $("select[name!=account_type]").change(function() {
+            var new_value = $(this).val();
+            var row = $(this).parents("tr");
+            var summary_value = $(":input[name$='summary']", row).val()
+            $("tr ~ tr").each(function() {
+                if ($(":input[name$='summary']", this).val() == summary_value) {
+                    $("select", this).each(function() {
+                        if ($(this).val() == "") {
+                            $(this).val(new_value);
+                        }
+                    });
+                }
+            });
+        });
+    });
+  </script>
 {% endblock page-js %}

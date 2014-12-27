@@ -73,9 +73,14 @@ class TransactionBaseFormSet(BaseFormSet):
         account_choices = get_account_choices(self.user)
         form.fields["account_debit"].choices = account_choices
         form.fields["account_credit"].choices = account_choices
-        form.fields["DELETE"].label = "Duplicate"
+        if "DELETE" in form.fields:
+            form.fields["DELETE"].label = "Duplicate"
         return form
 
 
-TransactionFormSet = formset_factory(TransactionForm, can_delete=True, extra=0,
+TransactionImportFormSet = formset_factory(TransactionForm,
+                                           can_delete=True, extra=0,
+                                           formset=TransactionBaseFormSet)
+
+TransactionFormSet = formset_factory(TransactionForm,extra=5,
                                      formset=TransactionBaseFormSet)
