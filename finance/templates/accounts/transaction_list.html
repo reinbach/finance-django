@@ -7,7 +7,15 @@
   </h1>
 
   <div class="table-responsive">
-    <div class="col-md-12 text-right">
+    <div class="col-md-6">
+      <a href="{% url 'accounts.transaction.add' %}" class="btn btn-default">
+        Add Transaction
+      </a>
+      <a href="{% url 'accounts.transaction.import' %}" class="btn btn-default">
+        Import Transactions
+      </a>
+    </div>
+    <div class="col-md-6 text-right">
       {% bootstrap_pagination trxs %}
     </div>
 
