@@ -1,0 +1,4 @@
+BANK ID,Account Number,Account Type,Balance,Start Date,End Date,Transaction Type,Transaction Date,Transaction Amount,Transaction ID, Transaction Description
+031176110,93676359,SAVINGS,362.76,2014-01-01,2014-12-29,CREDIT,2014-11-30,0.22,116,Monthly Interest Paid
+031176110,93676359,SAVINGS,362.54,2014-01-01,2014-12-29,CREDIT,2014-10-31,0.23,115,Monthly Interest Paid
+031176110,93676359,SAVINGS,362.31,2014-01-01,2014-12-29,CREDIT,2014-09-30,0.22,114,Monthly Interest Paid

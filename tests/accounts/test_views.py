@@ -543,7 +543,7 @@ class TestTransactionImportView(BaseWebTest):
         self.acct2 = account_factory(profile=self.profile, is_category=False,
                                      parent=None)
         self.sample_file = os.path.join(settings.BASE_DIR,
-                                        "tests/import_test_sample.csv")
+                                        "tests/import_test_chase_sample.csv")
 
     def test_view(self):
         response = self.app.get(reverse("accounts.transaction.import"),

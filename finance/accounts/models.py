@@ -135,11 +135,23 @@ class TransactionsImport():
 
     def map_fields(self, trx_import):
         """Map the respecitve fields"""
-        return {
-            'date': trx_import['Post Date'],
-            'summary': trx_import['Description'],
-            'amount': trx_import['Amount'],
-        }
+        if 'Post Date' in trx_import.keys():
+            return {
+                'date': datetime.datetime.strptime(trx_import['Post Date'],
+                                                   "%m/%d/%Y"),
+                'summary': trx_import['Description'],
+                'amount': trx_import['Amount'],
+            }
+        elif 'BANK ID' in trx_import.keys():
+            return {
+                'date': datetime.datetime.strptime(
+                    trx_import['Transaction Date'], "%Y-%m-%d"
+                ),
+                'summary': trx_import[' Transaction Description'],
+                'amount': trx_import['Transaction Amount']
+            }
+        else:
+            raise 'Unknown file format'
 
     def set_accounts(self, trx):
         """Set debit/credit accounts for transaction"""
@@ -168,5 +180,5 @@ class TransactionsImport():
         return bool(Transaction.objects.filter(
             summary=trx['summary'],
             amount=trx['amount'],
-            date=datetime.datetime.strptime(trx['date'], "%m/%d/%Y")
+            date=trx['date']
         ).first())
