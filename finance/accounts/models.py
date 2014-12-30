@@ -84,7 +84,7 @@ class Transaction(models.Model):
     account_credit = models.ForeignKey(Account, related_name="credit",
                                        verbose_name="credit")
     amount = models.DecimalField(decimal_places=2, max_digits=8)
-    summary = models.CharField(max_length=50)
+    summary = models.CharField(max_length=100)
     description = models.CharField(max_length=250, blank=True)
     date = models.DateField()
 
