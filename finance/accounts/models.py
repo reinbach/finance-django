@@ -166,11 +166,12 @@ class TransactionsImport():
 
     def get_account(self, summary):
         """Look for other side of transaction based on description"""
-        res = Transaction.objects.filter(summary=summary).first()
-
+        res = Transaction.objects.filter(summary=summary).filter(
+            Q(account_debit__pk=self.main_account_pk) |
+            Q(account_credit__pk=self.main_account_pk)
+        ).first()
         if res is None:
             return None
-
         if res.account_debit.pk == self.main_account_pk:
             return res.account_credit.pk
         return res.account_debit.pk

@@ -131,6 +131,15 @@ class TestTransactionsImport():
         t = TransactionsImport(acct2.pk, self.TEST_FILE)
         assert t.get_account("sumelse") is None
 
+    def test_get_account_none_not_debit_or_credit(self):
+        acct1 = account_factory()
+        acct2 = account_factory()
+        acct3 = account_factory()
+        transaction_factory(account_debit=acct1, account_credit=acct3,
+                            summary="sum")
+        t = TransactionsImport(acct2.pk, self.TEST_FILE)
+        assert t.get_account("sum") is None
+
     def test_set_accounts_debit(self):
         acct1 = account_factory()
         acct2 = account_factory()
