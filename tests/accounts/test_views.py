@@ -237,6 +237,7 @@ class TestAccountAddAjaxView(BaseWebTest):
         assert response.status_code == 200
         assert Account.objects.filter(name="acct1").exists() is True
         acct = Account.objects.get(name="acct1")
+        assert acct.is_category is False
         res = json.loads(response.body)
         assert res["new_pk"] == acct.pk
         assert '<option value="{0}">- acct1</option>'.format(
@@ -245,6 +246,29 @@ class TestAccountAddAjaxView(BaseWebTest):
         assert '<option value="">{0}</option>'.format(
             acct_type.name
         ) in res["result"]
+
+    def test_view_category(self):
+        acct_type = account_type_factory(profile=self.profile)
+        data = {
+            "name": "acct1",
+            "account_type": acct_type.pk,
+            "is_category": True
+        }
+        response = self.app.post(reverse("accounts.account.add"), data,
+                                 user=self.user, xhr=True)
+        assert response.status_code == 200
+        assert Account.objects.filter(name="acct1").exists() is True
+        acct = Account.objects.get(name="acct1")
+        assert acct.is_category is True
+        res = json.loads(response.body)
+        assert res["new_pk"] == acct.pk
+        assert '<option value="">- acct1</option>' in res["result"]
+        assert '<option value="">{0}</option>'.format(
+            acct_type.name
+        ) in res["result"]
+        assert '<option value="{0}">- acct1</option>'.format(
+            acct.pk
+        ) in res["parent"]
 
     def test_validation(self):
         data = {
