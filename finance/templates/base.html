@@ -64,11 +64,6 @@
                 <li{% if page == "accounts" %} class="active"{% endif %}>
                   <a href="{% url 'accounts.account.list' %}">Accounts</a>
                 </li>
-                <li{% if page == "transactions" %} class="active"{% endif %}>
-                  <a href="{% url 'accounts.transaction.list' %}">
-                    Transactions
-                  </a>
-                </li>
                 <li><a href="#">Reports</a></li>
               {% endblock page-menu %}
             </ul>

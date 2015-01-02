@@ -70,12 +70,12 @@ class Account(models.Model):
         balance = 0
         for trx in trxs:
             # remove duplicate information
-            if self == trx.account_debit:
-                balance += trx.amount
-            else:
-                balance -= trx.amount
-            trx_list.append((trx, balance))
-        return trx_list
+            if self == trx.account_credit:
+                trx.amount = trx.amount * -1
+            balance += trx.amount
+            trx.balance = balance
+            trx_list.append(trx)
+        return trx_list[::-1]
 
 
 class Transaction(models.Model):

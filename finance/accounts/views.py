@@ -1,13 +1,12 @@
 from django.contrib import messages
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.core.urlresolvers import reverse_lazy, reverse
-from django.db.models import Q
 from django.http import JsonResponse
-from django.shortcuts import render_to_response, get_object_or_404
+from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.template.loader import render_to_string
 from django.views.generic import (TemplateView, CreateView, UpdateView,
-                                  DeleteView, ListView, FormView)
+                                  DeleteView, ListView, FormView, DetailView)
 from finance.accounts.forms import (AccountTypeForm, TransactionImportForm,
                                     TransactionFormSet, AccountForm,
                                     TransactionImportFormSet)
@@ -192,24 +191,19 @@ class AccountDeleteView(DeleteView):
         return response
 
 
-class TransactionView(ListView):
-    model = Transaction
+class AccountTransactionView(DetailView):
+    model = Account
+    template_name = "accounts/transaction_list.html"
 
     def get_queryset(self):
-        qs = super(TransactionView, self).get_queryset()
-        qs = qs.filter(account_debit__profile__user=self.request.user)
-        if "pk" in self.kwargs:
-            qs = qs.filter(Q(account_debit__pk=self.kwargs["pk"]) |
-                           Q(account_credit__pk=self.kwargs["pk"]))
+        qs = super(AccountTransactionView, self).get_queryset()
+        qs = qs.filter(profile__user=self.request.user)
         return qs
 
     def get_context_data(self, **kwargs):
-        kwargs = super(TransactionView, self).get_context_data(**kwargs)
-        kwargs["page"] = "transactions"
-        if "pk" in self.kwargs:
-            kwargs["account"] = get_object_or_404(Account,
-                                                  pk=self.kwargs["pk"])
-        paginator = Paginator(kwargs["object_list"], 25)
+        kwargs = super(AccountTransactionView, self).get_context_data(**kwargs)
+        kwargs["page"] = "accounts"
+        paginator = Paginator(kwargs["object"].transactions(), 25)
         page = self.request.GET.get("page")
         try:
             trxs = paginator.page(page)
@@ -225,7 +219,7 @@ class TransactionView(ListView):
 class TransactionAddView(FormView):
     template_name = "accounts/transaction_add.html"
     form_class = TransactionFormSet
-    success_url = reverse_lazy("accounts.transaction.list")
+    success_url = reverse_lazy("accounts.account.list")
 
     def get_form_kwargs(self):
         kwargs = super(TransactionAddView, self).get_form_kwargs()
@@ -234,7 +228,7 @@ class TransactionAddView(FormView):
 
     def get_context_data(self, **kwargs):
         kwargs = super(TransactionAddView, self).get_context_data(**kwargs)
-        kwargs["page"] = "transactions"
+        kwargs["page"] = "accounts"
         kwargs["form_account"] = AccountForm(user=self.request.user)
         return kwargs
 
@@ -254,7 +248,7 @@ class TransactionAddView(FormView):
 
 class TransactionEditView(UpdateView):
     model = Transaction
-    success_url = reverse_lazy("accounts.transaction.list")
+    success_url = reverse_lazy("accounts.account.list")
 
     def get_success_url(self):
         if "next" in self.request.GET:
@@ -276,7 +270,7 @@ class TransactionEditView(UpdateView):
 
     def get_context_data(self, **kwargs):
         kwargs = super(TransactionEditView, self).get_context_data(**kwargs)
-        kwargs["page"] = "transactions"
+        kwargs["page"] = "accounts"
         return kwargs
 
     def form_valid(self, form):
@@ -287,7 +281,7 @@ class TransactionEditView(UpdateView):
 
 class TransactionDeleteView(DeleteView):
     model = Transaction
-    success_url = reverse_lazy("accounts.transaction.list")
+    success_url = reverse_lazy("accounts.account.list")
 
     def get_queryset(self):
         qs = super(TransactionDeleteView, self).get_queryset()
@@ -304,11 +298,11 @@ class TransactionDeleteView(DeleteView):
 class TransactionImportView(FormView):
     template_name = "accounts/transaction_import.html"
     form_class = TransactionImportForm
-    success_url = reverse_lazy("accounts.transaction.list")
+    success_url = reverse_lazy("accounts.account.list")
 
     def get_context_data(self, **kwargs):
         kwargs = super(TransactionImportView, self).get_context_data(**kwargs)
-        kwargs["page"] = "transactions"
+        kwargs["page"] = "accounts"
         return kwargs
 
     def get_form_kwargs(self):
@@ -330,7 +324,7 @@ class TransactionImportView(FormView):
 class TransactionImportConfirmView(FormView):
     template_name = "accounts/transaction_import_confirm.html"
     form_class = TransactionImportFormSet
-    success_url = reverse_lazy("accounts.transaction.list")
+    success_url = reverse_lazy("accounts.account.list")
 
     def get_form_kwargs(self):
         kwargs = super(TransactionImportConfirmView, self).get_form_kwargs()
@@ -340,7 +334,7 @@ class TransactionImportConfirmView(FormView):
     def get_context_data(self, **kwargs):
         kwargs = super(TransactionImportConfirmView,
                        self).get_context_data(**kwargs)
-        kwargs["page"] = "transactions"
+        kwargs["page"] = "accounts"
         kwargs["form_account"] = AccountForm(user=self.request.user)
         return kwargs
 

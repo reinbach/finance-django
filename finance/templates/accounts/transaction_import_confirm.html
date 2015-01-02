@@ -2,7 +2,7 @@
 {% load staticfiles bootstrap3 %}
 
 {% block page-content %}
-  <h1 class="page-header">Transactions</h1>
+  <h1 class="page-header">Accounts</h1>
 
   <h2 class="sub-header">Confirm Import Transactions</h2>
   <div class="table-responsive">
@@ -10,7 +10,7 @@
       {% include "accounts/transaction_formset.html" %}
       {% buttons %}
         <input type="submit" class="btn btn-success" value="Import Transactions" />
-        <a href="{% url 'accounts.transaction.list' %}" class="btn btn-danger">Cancel</a>
+        <a href="{% url 'accounts.account.list' %}" class="btn btn-danger">Cancel</a>
       {% endbuttons %}
     </form>
   </div>

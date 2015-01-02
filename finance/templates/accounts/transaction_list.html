@@ -2,9 +2,8 @@
 {% load bootstrap3 %}
 
 {% block page-content %}
-  <h1 class="page-header">
-    Transactions{% if account %}: {{ account }}{% endif %}
-  </h1>
+  <h1 class="page-header">Accounts</h1>
+  <h2 class="sub-header">{{ object }}</h2>
 
   <div class="table-responsive">
     <div class="col-md-6">
@@ -25,9 +24,12 @@
           <th>Date</th>
           <th>Debit</th>
           <th>Credit</th>
-          <th>Amount</th>
           <th>Summary</th>
           <th>Description</th>
+          <th>Amount</th>
+          {% if account %}
+            <th>Balance</th>
+          {% endif %}
           <th>Action</th>
         </tr>
       </thead>
@@ -37,9 +39,12 @@
             <td>{{ trx.date }}</td>
             <td>{{ trx.account_debit }}</td>
             <td>{{ trx.account_credit }}</td>
-            <td class="text-right">{{ trx.amount|floatformat:"2" }}</td>
             <td>{{ trx.summary }}</td>
             <td>{{ trx.description }}</td>
+            <td class="text-right">{{ trx.amount|floatformat:"2" }}</td>
+            {% if account %}
+              <td class="text-right">{{ trx.balance|floatformat:"2" }}</td>
+            {% endif %}
             <td>
               <a href="{% url 'accounts.transaction.edit' trx.pk %}{% if account %}?next={{ account.pk }}{% endif %}" class="btn btn-sm btn-default">Edit</a>
               <button type="button" class="btn btn-sm btn-danger" data-toggle="modal" data-target="#trxModalDelete{{ trx.pk }}">Delete</button>

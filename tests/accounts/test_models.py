@@ -56,9 +56,12 @@ class TestAccount():
                                  date=datetime.date(2010, 4, 2))
         trxs = a.transactions()
         assert len(trxs) == 3
-        assert trxs[0] == (t1, Decimal("5.00"))
-        assert trxs[1] == (t2, Decimal("2.50"))
-        assert trxs[2] == (t3, Decimal("17.65"))
+        assert trxs[0] == t3
+        assert trxs[0].balance == Decimal("17.65")
+        assert trxs[1] == t2
+        assert trxs[1].balance == Decimal("2.50")
+        assert trxs[2] == t1
+        assert trxs[2].balance == Decimal("5.00")
 
     def test_subaccounts(self):
         a = account_factory(name="acct1", parent=None)
@@ -179,6 +182,14 @@ class TestChaseTransactionsImport():
         assert trx["date"] == datetime.datetime(2010, 1, 1, 0, 0, 0)
         assert trx["summary"] == "sum"
         assert trx["amount"] == "15.25"
+
+    def test_map_field_unknown(self):
+        trx_import = {"Date": "01/01/2010",
+                      "Description": "sum", "Amount": "15.25"}
+        acct1 = account_factory()
+        t = TransactionsImport(acct1.pk, self.TEST_FILE)
+        with pytest.raises(Exception):
+            t.map_fields(trx_import)
 
     def test_parse_file(self):
         acct = account_factory()
