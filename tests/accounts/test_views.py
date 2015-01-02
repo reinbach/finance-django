@@ -553,6 +553,20 @@ class TestTransactionDeleteView(BaseWebTest):
         assert "Successfully deleted Transaction" in response
         assert Transaction.objects.filter(pk=trx.pk).exists() is False
 
+    def test_redirect(self):
+        trx = transaction_factory(account_debit=self.acct1,
+                                  account_credit=self.acct2)
+        response = self.app.post("{0}?next={1}".format(
+            reverse("accounts.transaction.delete", args=[trx.pk]),
+            self.acct1.pk
+        ), user=self.user).follow()
+        assert response.status_code == 200
+        assert "Successfully deleted Transaction" in response
+        assert Transaction.objects.filter(pk=trx.pk).exists() is False
+        assert '<h2 class="sub-header">{0}</h2>'.format(
+            self.acct1.name
+        ) in response
+
     def test_permission(self):
         trx = transaction_factory(account_debit=self.acct1,
                                   account_credit=self.acct2)

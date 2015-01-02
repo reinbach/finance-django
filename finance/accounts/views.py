@@ -212,6 +212,7 @@ class AccountTransactionView(DetailView):
         except EmptyPage:
             trxs = paginator.page(paginator.num_pages)
         kwargs["trxs"] = trxs
+        kwargs["page_number"] = page
 
         return kwargs
 
@@ -252,8 +253,12 @@ class TransactionEditView(UpdateView):
 
     def get_success_url(self):
         if "next" in self.request.GET:
-            return reverse("accounts.transaction.list.by_account",
-                           args=[self.request.GET["next"]])
+            page = self.request.GET.get("page", 1)
+            return "{0}?page={1}".format(
+                reverse("accounts.transaction.list.by_account",
+                        args=[self.request.GET["next"]]),
+                page
+            )
         return super(TransactionEditView, self).get_success_url()
 
     def get_queryset(self):
@@ -282,6 +287,16 @@ class TransactionEditView(UpdateView):
 class TransactionDeleteView(DeleteView):
     model = Transaction
     success_url = reverse_lazy("accounts.account.list")
+
+    def get_success_url(self):
+        if "next" in self.request.GET:
+            page = self.request.GET.get("page", 1)
+            return "{0}?page={1}".format(
+                reverse("accounts.transaction.list.by_account",
+                        args=[self.request.GET["next"]]),
+                page
+            )
+        return super(TransactionDeleteView, self).get_success_url()
 
     def get_queryset(self):
         qs = super(TransactionDeleteView, self).get_queryset()
