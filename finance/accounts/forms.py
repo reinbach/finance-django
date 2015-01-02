@@ -82,5 +82,5 @@ TransactionImportFormSet = formset_factory(TransactionForm,
                                            can_delete=True, extra=0,
                                            formset=TransactionBaseFormSet)
 
-TransactionFormSet = formset_factory(TransactionForm,extra=5,
+TransactionFormSet = formset_factory(TransactionForm, extra=5,
                                      formset=TransactionBaseFormSet)
