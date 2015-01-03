@@ -6,7 +6,6 @@ import subprocess
 from decimal import Decimal
 from django.db.models import Q
 from finance.accounts.models import Transaction
-from tempfile import NamedTemporaryFile
 
 
 class TransactionsImport():
@@ -59,10 +58,11 @@ class TransactionsImport():
         file_type = self.get_file_type()
 
         if file_type == "PDF":
-            temp_file = NamedTemporaryFile()
+            temp_filename, _ = os.path.splitext(self.filename)
+            temp_file = "{0}.txt".format(temp_filename)
             subprocess.Popen(["pdftotext", "-layout", self.filename,
-                              temp_file.name]).communicate()
-            with open(temp_file.name, "rb") as fp:
+                              temp_file]).communicate()
+            with open(temp_file, "rb") as fp:
                 for row in fp:
                     try:
                         data = row.split(" " * 15)
@@ -76,6 +76,7 @@ class TransactionsImport():
                         self.add_trx(trx)
                     except Exception:
                         pass
+            os.unlink(temp_file)
         else:
             with open(self.filename, 'rb') as fp:
                 filereader = csv.DictReader(fp, delimiter=',')
