@@ -18,6 +18,22 @@ class TestTransactionsImport():
         assert t.main_account_pk == a.pk
         assert t.filename == self.TEST_FILE
         assert t.transactions == []
+        assert t.year == datetime.date.today().year
+
+    def test_get_file_type(self):
+        a = account_factory()
+        t = TransactionsImport(a.pk, "example.csv")
+        assert t.get_file_type() == "CSV"
+
+    def test_get_file_type_pdf(self):
+        a = account_factory()
+        t = TransactionsImport(a.pk, "example.pdf")
+        assert t.get_file_type() == "PDF"
+
+    def test_get_file_type_default(self):
+        a = account_factory()
+        t = TransactionsImport(a.pk, "example.png")
+        assert t.get_file_type() == "CSV"
 
     def test_is_duplicate(self):
         trx = {"summary": "sum", "amount": "10.00",
@@ -96,7 +112,7 @@ class TestTransactionsImport():
 
 
 @pytest.mark.django_db
-class TestChaseTransactionsImport():
+class TestChaseCSVTransactionsImport():
     TEST_FILE = os.path.join(settings.BASE_DIR,
                              "tests/import_test_chase_sample.csv")
 
@@ -172,3 +188,26 @@ class TestCapitalOne360TransactionsImport():
         assert t.transactions[0]["DELETE"] is True
         assert t.transactions[1]["DELETE"] is False
         assert t.transactions[2]["DELETE"] is False
+
+
+@pytest.mark.django_db
+class TestChasePDFTransactionsImport():
+    TEST_FILE = os.path.join(settings.BASE_DIR,
+                             "tests/import_test_chase_sample.pdf")
+
+    def test_parse_file(self):
+        acct = account_factory()
+        t = TransactionsImport(acct.pk, self.TEST_FILE)
+        t.parse_file()
+        assert len(t.transactions) == 69
+
+    def test_parse_file_duplicate(self):
+        acct = account_factory()
+        transaction_factory(account_credit=acct,
+                            summary="THE OXFORD HOUSE INN FRYEBURG ME",
+                            amount="111.26", date="2013-12-14")
+        t = TransactionsImport(acct.pk, self.TEST_FILE, year=2013)
+        t.parse_file()
+        assert len(t.transactions) == 69
+        assert t.transactions[0]["DELETE"] is True
+        assert t.transactions[-1]["DELETE"] is False

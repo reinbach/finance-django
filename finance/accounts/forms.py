@@ -1,3 +1,5 @@
+import datetime
+import os
 import uuid
 
 from django import forms
@@ -40,20 +42,27 @@ class AccountForm(forms.ModelForm):
 class TransactionImportForm(forms.Form):
     account_main = forms.ChoiceField()
     filename = forms.FileField()
+    year = forms.ChoiceField(required=False)
 
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop("user")
         super(TransactionImportForm, self).__init__(*args, **kwargs)
         self.fields["account_main"].choices = get_account_choices(self.user)
+        current_year = datetime.date.today().year
+        year_choices = [(x, x) for x in range(current_year - 2,
+                                              current_year + 1)]
+        self.fields["year"].choices = [("", "-" * 9)] + year_choices
 
     def process_file(self):
-        filename = "{0}/imports/{1}.csv".format(settings.MEDIA_ROOT,
-                                                uuid.uuid4())
+        _, file_ext = os.path.splitext(self.files["filename"].name)
+        filename = "{0}/imports/{1}{2}".format(settings.MEDIA_ROOT,
+                                                uuid.uuid4(), file_ext)
         with open(filename, "wb+") as destination:
             for chunk in self.files["filename"].chunks():
                 destination.write(chunk)
         parser = TransactionsImport(self.cleaned_data["account_main"],
-                                    filename)
+                                    filename,
+                                    year=self.cleaned_data.get("year"))
         parser.parse_file()
         return parser.transactions
 
