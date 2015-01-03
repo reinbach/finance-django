@@ -39,6 +39,7 @@ def setup_logdir():
     with settings(user="root"):
         with cd(env.app_dir):
             run("mkdir logs")
+            run("touch logs/debug.log")
             run("chown -R uwsgi:uwsgi logs")
 
 
