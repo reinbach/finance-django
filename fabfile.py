@@ -35,6 +35,13 @@ def setup_uwsgi():
     ))
 
 
+def setup_logdir():
+    with settings(user="root"):
+        with cd(env.app_dir):
+            run("mkdir logs")
+            run("chown -R uwsgi:uwsgi logs")
+
+
 def update_db():
     run("source {0}/bin/activate &&"
         " python manage.py migrate".format(env.app_dir))
@@ -52,12 +59,12 @@ def install():
             app_dir=env.app_dir
         ))
         with cd(env.app_dir):
-            # clone repo
             run("git clone {repo} master".format(repo=env.repo))
             with cd("master"):
                 install_requirements()
                 setup_nginx()
                 setup_uwsgi()
+        setup_logdir()
     print("Setup environment variables and then do an update.")
 
 
