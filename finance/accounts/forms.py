@@ -4,7 +4,8 @@ from django import forms
 from django.conf import settings
 from django.forms.formsets import formset_factory, BaseFormSet
 from finance.accounts.models import (AccountType, Transaction,
-                                     TransactionsImport, Account)
+                                     Account)
+from finance.accounts.trx_import import TransactionsImport
 from finance.accounts.utils import (get_account_choices,
                                     get_account_type_choices)
 
