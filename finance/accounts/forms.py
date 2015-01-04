@@ -15,7 +15,7 @@ from finance.accounts.utils import (get_account_choices,
 class AccountTypeForm(forms.ModelForm):
     class Meta:
         model = AccountType
-        fields = ["name"]
+        fields = ["name", "default_type"]
 
     def clean(self):
         data = super(AccountTypeForm, self).clean()

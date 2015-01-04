@@ -4,7 +4,13 @@ from finance.core.models import Profile
 
 
 class AccountType(models.Model):
+    TYPE_CHOICES = (
+        ("DEBIT", "Debit"),
+        ("CREDIT", "Credit"),
+    )
     name = models.CharField(max_length=20)
+    default_type = models.CharField(max_length=20, choices=TYPE_CHOICES,
+                                    default="DEBIT")
     profile = models.ForeignKey(Profile)
 
     class Meta:
