@@ -4,7 +4,8 @@ import pytest
 
 from django.conf import settings
 from finance.accounts.trx_import import TransactionsImport
-from tests.fixtures import account_factory, transaction_factory
+from tests.fixtures import (account_factory, account_type_factory,
+                            transaction_factory)
 
 
 @pytest.mark.django_db
@@ -86,7 +87,7 @@ class TestTransactionsImport():
         t = TransactionsImport(acct2.pk, self.TEST_FILE)
         assert t.get_account("sum") is None
 
-    def test_set_accounts_debit(self):
+    def test_set_accounts_debit_debit(self):
         acct1 = account_factory()
         acct2 = account_factory()
         transaction_factory(account_debit=acct1, account_credit=acct2,
@@ -98,7 +99,7 @@ class TestTransactionsImport():
         assert trx["account_credit"] == acct2.pk
         assert trx["amount"] == "10.00"
 
-    def test_set_accounts_credit(self):
+    def test_set_accounts_debit_credit(self):
         acct1 = account_factory()
         acct2 = account_factory()
         transaction_factory(account_debit=acct1, account_credit=acct2,
@@ -108,6 +109,32 @@ class TestTransactionsImport():
         t.set_accounts(trx)
         assert trx["account_debit"] == acct2.pk
         assert trx["account_credit"] == acct1.pk
+        assert trx["amount"] == "10.00"
+
+    def test_set_accounts_credit_debit(self):
+        acct_type1 = account_type_factory(default_type="CREDIT")
+        acct1 = account_factory(account_type=acct_type1)
+        acct2 = account_factory()
+        transaction_factory(account_debit=acct1, account_credit=acct2,
+                            summary="sum")
+        trx = {"summary": "sum", "amount": "10.00", "date": "01/01/2010"}
+        t = TransactionsImport(acct1.pk, self.TEST_FILE)
+        t.set_accounts(trx)
+        assert trx["account_credit"] == acct1.pk
+        assert trx["account_debit"] == acct2.pk
+        assert trx["amount"] == "10.00"
+
+    def test_set_accounts_credit_credit(self):
+        acct_type1 = account_type_factory(default_type="CREDIT")
+        acct1 = account_factory(account_type=acct_type1)
+        acct2 = account_factory()
+        transaction_factory(account_debit=acct1, account_credit=acct2,
+                            summary="sum")
+        trx = {"summary": "sum", "amount": "-10.00", "date": "01/01/2010"}
+        t = TransactionsImport(acct1.pk, self.TEST_FILE)
+        t.set_accounts(trx)
+        assert trx["account_debit"] == acct1.pk
+        assert trx["account_credit"] == acct2.pk
         assert trx["amount"] == "10.00"
 
 
