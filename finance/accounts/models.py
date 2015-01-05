@@ -46,14 +46,9 @@ class Account(models.Model):
             for acct in self.subaccounts():
                 balance += acct.balance()
         else:
-            debit_total = self.debit.all().aggregate(
-                total=Sum("amount")
-            )["total"]
-            credit_total = self.credit.all().aggregate(
-                total=Sum("amount")
-            )["total"]
-            balance += debit_total if debit_total is not None else 0
-            balance -= credit_total if credit_total is not None else 0
+            trxs = self.transactions()
+            if trxs:
+                balance = trxs[0].balance
         return balance
 
     def subaccounts(self):
@@ -71,7 +66,6 @@ class Account(models.Model):
         trx_list = []
         balance = 0
         for trx in trxs:
-            # remove duplicate information
             if self == trx.account_credit:
                 trx.amount = trx.amount * -1
             balance += trx.amount
