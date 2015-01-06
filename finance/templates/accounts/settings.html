@@ -13,6 +13,7 @@
           <th>#</th>
           <th>Name</th>
           <th>Type</th>
+          <th>Yearly</th>
           <th>Action</th>
         </tr>
       </thead>
@@ -22,6 +23,7 @@
             <td>{{ forloop.counter }}</td>
             <td>{{ account_type.name }}</td>
             <td>{{ account_type.get_default_type_display }}</td>
+            <td>{{ account_type.yearly|yesno|capfirst }}</td>
             <td>
               <a href="{% url 'accounts.account_type.edit' account_type.pk %}" class="btn btn-sm btn-default">Edit</a>
               <button type="button" class="btn btn-sm btn-danger" data-toggle="modal" data-target="#accountTypeModalDelete{{ account_type.pk }}">Delete</button>

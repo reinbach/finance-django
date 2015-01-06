@@ -12,14 +12,12 @@ class AccountType(models.Model):
     name = models.CharField(max_length=20)
     default_type = models.CharField(max_length=20, choices=TYPE_CHOICES,
                                     default="DEBIT")
+    yearly = models.BooleanField(default=False)
     profile = models.ForeignKey(Profile)
 
     class Meta:
         ordering = ["name"]
         unique_together = (("name", "profile"), )
-
-    # TODO add method that indicates accounts associated with
-    # remove delete link in list if accounts associated
 
     def __unicode__(self):
         return self.name

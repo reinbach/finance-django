@@ -12,5 +12,6 @@ urlpatterns = patterns(
     url(r'^contact/$', ContactView.as_view(), name='contact'),
     url(r'^user/', include('django.contrib.auth.urls')),
     url(r'^accounts/', include('finance.accounts.urls')),
+    url(r'^profile/', include('finance.core.urls')),
     url(r'^admin/', include(admin.site.urls)),
 ) + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

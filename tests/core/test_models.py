@@ -1,3 +1,4 @@
+import datetime
 import pytest
 
 from django.db import IntegrityError
@@ -25,3 +26,11 @@ class TestProfile():
         with pytest.raises(IntegrityError):
             p = Profile(user=u)
             p.save()
+
+    def test_current_year_none(self):
+        p = profile_factory(current_year=None)
+        assert p.year == datetime.date.today().year
+
+    def test_current_year(self):
+        p = profile_factory(current_year=datetime.date(2010, 5, 16))
+        assert p.year == 2010
