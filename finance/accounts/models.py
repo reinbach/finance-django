@@ -1,5 +1,6 @@
+from django.core.cache import cache
 from django.db import models
-from django.db.models import Q, Sum
+from django.db.models import Q
 from finance.core.models import Profile
 
 
@@ -39,8 +40,15 @@ class Account(models.Model):
     def __unicode__(self):
         return self.name
 
+    @property
+    def cache_key(self):
+        return "account-{0}".format(self.pk)
+
     def balance(self):
         """Current balance of account"""
+        balance = cache.get(self.cache_key)
+        if balance is not None:
+            return balance
         balance = 0
         if self.is_category:
             for acct in self.subaccounts():
@@ -49,6 +57,7 @@ class Account(models.Model):
             trxs = self.transactions()
             if trxs:
                 balance = trxs[0].balance
+        cache.set(self.cache_key, balance)
         return balance
 
     def subaccounts(self):
@@ -88,12 +97,12 @@ class Transaction(models.Model):
         ordering = ["-date", ]
 
     def __unicode__(self):
-        # TODO determine account debit and then show amount in
-        # negative or positive
-        # or think of a better short description of transaction to show
         return u"{summary} {amount}".format(
             summary=self.summary,
             amount=self.amount
         )
 
-
+    def save(self, **kwargs):
+        super(Transaction, self).save(**kwargs)
+        cache.delete_many([self.account_debit.cache_key,
+                           self.account_credit.cache_key])
