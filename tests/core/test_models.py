@@ -32,5 +32,5 @@ class TestProfile():
         assert p.year == datetime.date.today().year
 
     def test_current_year(self):
-        p = profile_factory(current_year=datetime.date(2010, 5, 16))
+        p = profile_factory(current_year=2010)
         assert p.year == 2010

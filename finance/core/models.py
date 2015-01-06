@@ -20,5 +20,5 @@ class Profile(models.Model):
     @property
     def year(self):
         if self.current_year is not None:
-            return self.current_year.year
+            return self.current_year
         return datetime.date.today().year
