@@ -56,7 +56,7 @@ class TransactionImportForm(forms.Form):
     def process_file(self):
         _, file_ext = os.path.splitext(self.files["filename"].name)
         filename = "{0}/imports/{1}{2}".format(settings.MEDIA_ROOT,
-                                                uuid.uuid4(), file_ext)
+                                               uuid.uuid4(), file_ext)
         with open(filename, "wb+") as destination:
             for chunk in self.files["filename"].chunks():
                 destination.write(chunk)
