@@ -1,3 +1,5 @@
+import datetime
+
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from finance.core.models import Profile
@@ -104,3 +106,34 @@ class TestLogoutView(BaseWebTest):
         response = self.app.get(reverse("logout"), user=self.user)
         assert response.status_code == 200
         assert "You have successfully logged out" in response
+
+
+class TestProfileView(BaseWebTest):
+    def test_view(self):
+        response = self.app.get(reverse("profile.home"), user=self.user)
+        assert response.status_code == 200
+        assert '<h1 class="page-header">Profile</h1>' in response
+
+        form = response.forms[1]
+        new_year = datetime.date.today().year
+        form["current_year"] = new_year
+        response = form.submit().follow()
+        assert response.status_code == 200
+
+        p = Profile.objects.get(pk=self.profile.pk)
+        assert p.current_year == new_year
+
+    def test_permissions(self):
+        response = self.app.get(reverse("profile.home"))
+        assert response.status_code == 302
+
+    def test_validation(self):
+        response = self.app.get(reverse("profile.home"), user=self.user)
+        assert response.status_code == 200
+        assert '<h1 class="page-header">Profile</h1>' in response
+
+        form = response.forms[1]
+        form["current_year"].force_value("")
+        response = form.submit()
+        assert response.status_code == 200
+        assert "is required" in response
