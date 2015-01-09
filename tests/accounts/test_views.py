@@ -14,7 +14,7 @@ class TestDashboardView(BaseWebTest):
     def test_view(self):
         response = self.app.get(reverse("accounts.dashboard"), user=self.user)
         assert response.status_code == 200
-        assert '<h1 class="page-header">Dashboard</h1>' in response
+        assert '<h1 class="page-header">Dashboard' in response
 
     def test_permissions(self):
         response = self.app.get(reverse("accounts.dashboard"))
@@ -166,7 +166,7 @@ class TestAccountView(BaseWebTest):
         response = self.app.get(reverse("accounts.account.list"),
                                 user=self.user)
         assert response.status_code == 200
-        assert '<h1 class="page-header">Accounts</h1>' in response
+        assert '<h1 class="page-header">Accounts' in response
         assert acct1.name in response
         assert acct2.name not in response
 
@@ -174,7 +174,7 @@ class TestAccountView(BaseWebTest):
         acct = account_factory(profile=self.profile, parent=None)
         response = self.app.get(reverse("accounts.account.list"))
         assert response.status_code == 302
-        assert '<h1 class="page-header">Accounts</h1>' not in response
+        assert '<h1 class="page-header">Accounts' not in response
         assert acct.name not in response
 
     def test_isolation(self):
@@ -185,7 +185,7 @@ class TestAccountView(BaseWebTest):
         response = self.app.get(reverse("accounts.account.list"),
                                 user=self.user)
         assert response.status_code == 200
-        assert '<h1 class="page-header">Accounts</h1>' in response
+        assert '<h1 class="page-header">Accounts' in response
         assert acct1.name in response
         assert acct2.name not in response
 
@@ -365,7 +365,7 @@ class TestAccountTransactionView(BaseWebTest):
                                         args=[self.acct1.pk]),
                                 user=self.user)
         assert response.status_code == 200
-        assert '<h1 class="page-header">Accounts</h1>' in response
+        assert '<h1 class="page-header">Accounts' in response
         assert '<h2 class="sub-header">{0}</h2>'.format(
             self.acct1.name
         ) in response
@@ -391,7 +391,7 @@ class TestAccountTransactionView(BaseWebTest):
                                         args=[self.acct1.pk]),
                                 user=self.user)
         assert response.status_code == 200
-        assert '<h1 class="page-header">Accounts</h1>' in response
+        assert '<h1 class="page-header">Accounts' in response
         assert '<h2 class="sub-header">{0}</h2>'.format(
             self.acct1.name
         ) in response
@@ -411,7 +411,7 @@ class TestAccountTransactionView(BaseWebTest):
         )
         response = self.app.get(url, user=self.user)
         assert response.status_code == 200
-        assert '<h1 class="page-header">Accounts</h1>' in response
+        assert '<h1 class="page-header">Accounts' in response
         assert '<h2 class="sub-header">{0}</h2>'.format(
             self.acct1.name
         ) in response
@@ -484,7 +484,7 @@ class TestTransactionEditView(BaseWebTest):
         assert "Successfully updated Transaction" in response
         updated_trx = Transaction.objects.get(pk=trx.pk)
         assert updated_trx.amount == Decimal("10.00")
-        assert '<h1 class="page-header">Accounts</h1>' in response
+        assert '<h1 class="page-header">Accounts' in response
 
     def test_redirect(self):
         trx = transaction_factory(account_debit=self.acct1,

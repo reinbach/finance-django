@@ -58,7 +58,7 @@
           <div class="col-sm-3 col-md-2 sidebar">
             <ul class="nav nav-sidebar">
               {% block page-menu %}
-                <li{% if not page %} class="active"{% endif %}>
+                <li{% if page == "dashboard" %} class="active"{% endif %}>
                   <a href="{% url 'accounts.dashboard' %}">Overview</a>
                 </li>
                 <li{% if page == "accounts" %} class="active"{% endif %}>
@@ -70,7 +70,9 @@
           </div>
           <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
             {% bootstrap_messages %}
-            {% block page-content %}{% endblock page-content %}
+            {% block page-content %}
+              <h1 class="page-header">{{ page|capfirst }} <span class="pull-right">{{ profile.year }}</span></h1>
+            {% endblock page-content %}
           </div>
         </div>
       </div>
