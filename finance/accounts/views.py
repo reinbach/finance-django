@@ -19,6 +19,11 @@ from finance.core.models import get_user_profile
 class DashboardView(TemplateView):
     template_name = "accounts/dashboard.html"
 
+    def get_context_data(self, **kwargs):
+        kwargs = super(DashboardView, self).get_context_data(**kwargs)
+        kwargs["page"] = "dashboard"
+        return kwargs
+
 
 class SettingsView(TemplateView):
     template_name = "accounts/settings.html"
