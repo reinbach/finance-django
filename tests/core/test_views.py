@@ -143,10 +143,14 @@ class TestProfileView(BaseWebTest):
 
     def test_clear_cache(self):
         acct_type = account_type_factory(profile=self.profile, yearly=True)
-        acct = account_factory(profile=self.profile, account_type=acct_type)
-        acct.balance()
-        assert cache.get(acct.cache_key) is not None
+        acct1 = account_factory(profile=self.profile, account_type=acct_type)
+        acct1.balance()
+        acct2 = account_factory()
+        acct2.balance()
+        assert cache.get(acct1.cache_key) is not None
+        assert cache.get(acct2.cache_key) is not None
         self.app.post(reverse("profile.home"),
                       {"current_year": self.profile.year},
                       user=self.user)
-        assert cache.get(acct.cache_key) is None
+        assert cache.get(acct1.cache_key) is None
+        assert cache.get(acct2.cache_key) is not None

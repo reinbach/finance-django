@@ -67,10 +67,7 @@ class ProfileView(UpdateView):
 
     def form_valid(self, form):
         response = super(ProfileView, self).form_valid(form)
-        # clear cache of related accounts
-        for acct in Account.objects.filter(profile=self.object,
-                                           account_type__yearly=True):
-            acct.clear_cache()
+        Account.objects.filter(profile=self.object).clear_cache()
         messages.success(self.request, "Successfully updated current year"
                          " to {0}".format(form.cleaned_data["current_year"]))
         return response

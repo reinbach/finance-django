@@ -23,6 +23,15 @@ class AccountType(models.Model):
         return self.name
 
 
+class AccountQuerySet(models.QuerySet):
+    def yearly(self):
+        return self.filter(account_type__yearly=True)
+
+    def clear_cache(self):
+        for acct in self.yearly():
+            acct.clear_cache()
+
+
 class Account(models.Model):
     name = models.CharField(max_length=50)
     description = models.CharField(max_length=250, blank=True)
@@ -31,6 +40,8 @@ class Account(models.Model):
     parent = models.ForeignKey('Account', null=True, blank=True,
                                limit_choices_to={"is_category": True})
     is_category = models.BooleanField(default=False)
+
+    objects = AccountQuerySet.as_manager()
 
     class Meta:
         ordering = ["account_type", "name"]
