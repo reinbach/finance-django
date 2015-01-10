@@ -42,6 +42,9 @@ class Account(models.Model):
     def cache_key(self):
         return "account-{0}".format(self.pk)
 
+    def clear_cache(self):
+        cache.delete(self.cache_key)
+
     def balance(self):
         """Current balance of account"""
         balance = cache.get(self.cache_key)
@@ -67,9 +70,10 @@ class Account(models.Model):
         We want to clearly indicate the opposite account
         And maintain a running balance for each transaction
         """
+        year = self.profile.year
         trxs = Transaction.objects.filter(
             Q(account_debit=self) | Q(account_credit=self)
-        ).order_by("date")
+        ).filter(date__year=year).order_by("date")
         trx_list = []
         balance = 0
         for trx in trxs:

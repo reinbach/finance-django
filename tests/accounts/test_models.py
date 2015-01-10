@@ -4,7 +4,7 @@ import pytest
 from decimal import Decimal
 from finance.accounts.models import Account, AccountType, Transaction
 from tests.fixtures import (account_factory, account_type_factory,
-                            transaction_factory)
+                            transaction_factory, profile_factory)
 
 
 class TestAccountType():
@@ -21,10 +21,18 @@ class TestAccount():
         assert unicode(a) == "acct"
 
     def test_balance(self):
-        a = account_factory()
-        transaction_factory(account_debit=a, amount="5")
-        transaction_factory(account_credit=a, amount="2.5")
-        transaction_factory(account_debit=a, amount="15.15")
+        year = 2010
+        p = profile_factory(current_year=year)
+        a = account_factory(profile=p)
+        transaction_factory(account_debit=a, amount="5",
+                            date=datetime.date(year, 3, 2))
+        transaction_factory(account_credit=a, amount="2.5",
+                            date=datetime.date(year, 4, 6))
+        transaction_factory(account_debit=a, amount="15.15",
+                            date=datetime.date(year, 8, 1))
+        # this trx is outside of the current year and should be ignored
+        transaction_factory(account_debit=a, amount="20.00",
+                            date=datetime.date(year + 1, 1, 8))
         assert a.balance() == Decimal("17.65")
 
     def test_balance_empty(self):
@@ -32,25 +40,39 @@ class TestAccount():
         assert a.balance() == 0
 
     def test_balance_subaccounts(self):
-        acct1 = account_factory(parent=None, is_category=True)
-        acct2 = account_factory(parent=acct1, is_category=True)
-        acct3 = account_factory(parent=acct2, is_category=False)
-        acct4 = account_factory(parent=acct1, is_category=False)
-        transaction_factory(account_debit=acct3, amount="5.25")
-        transaction_factory(account_debit=acct3, amount="2.50")
-        transaction_factory(account_debit=acct4, amount="10.10")
-        transaction_factory(account_credit=acct4, amount="1.00")
+        year = 2010
+        p = profile_factory(current_year=year)
+        acct1 = account_factory(profile=p, parent=None, is_category=True)
+        acct2 = account_factory(profile=p, parent=acct1, is_category=True)
+        acct3 = account_factory(profile=p, parent=acct2, is_category=False)
+        acct4 = account_factory(profile=p, parent=acct1, is_category=False)
+        transaction_factory(account_debit=acct3, amount="5.25",
+                            date=datetime.date(year, 2, 1))
+        transaction_factory(account_debit=acct3, amount="2.50",
+                            date=datetime.date(year, 4, 7))
+        transaction_factory(account_debit=acct4, amount="10.10",
+                            date=datetime.date(year, 7, 19))
+        transaction_factory(account_credit=acct4, amount="1.00",
+                            date=datetime.date(year, 12, 14))
+        # this trx is outside of the current year and should be ignored
+        transaction_factory(account_credit=acct4, amount="20.00",
+                            date=datetime.date(year + 1, 1, 4))
         assert acct1.balance() == Decimal("16.85")
         assert acct2.balance() == Decimal("7.75")
 
     def test_transactions(self):
-        a = account_factory()
+        year = 2010
+        p = profile_factory(current_year=year)
+        a = account_factory(profile=p)
         t1 = transaction_factory(account_debit=a, amount="5",
-                                 date=datetime.date(2010, 1, 1))
+                                 date=datetime.date(year, 1, 1))
         t2 = transaction_factory(account_credit=a, amount="2.5",
-                                 date=datetime.date(2010, 4, 1))
+                                 date=datetime.date(year, 4, 1))
         t3 = transaction_factory(account_debit=a, amount="15.15",
-                                 date=datetime.date(2010, 4, 2))
+                                 date=datetime.date(year, 4, 2))
+        # this trx is outside of the current year and should be ignored
+        transaction_factory(account_debit=a, amount="20.20",
+                            date=datetime.date(year + 1, 1, 2))
         trxs = a.transactions()
         assert len(trxs) == 3
         assert trxs[0] == t3

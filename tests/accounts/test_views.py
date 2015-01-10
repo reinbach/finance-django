@@ -360,7 +360,8 @@ class TestAccountTransactionView(BaseWebTest):
 
     def test_view(self):
         transaction_factory(account_debit=self.acct1,
-                            account_credit=self.acct2, amount="10.00")
+                            account_credit=self.acct2, amount="10.00",
+                            date=datetime.date(self.profile.year, 7, 21))
         response = self.app.get(reverse("accounts.transaction.list.by_account",
                                         args=[self.acct1.pk]),
                                 user=self.user)
@@ -381,7 +382,8 @@ class TestAccountTransactionView(BaseWebTest):
 
     def test_isolation(self):
         transaction_factory(account_debit=self.acct1,
-                            account_credit=self.acct2, amount="10.00")
+                            account_credit=self.acct2, amount="10.00",
+                            date=datetime.date(self.profile.year, 5, 19))
         profile = profile_factory()
         acct1 = account_factory(profile=profile, name="n_acct1")
         acct2 = account_factory(profile=profile, name="n_acct2")
@@ -404,7 +406,8 @@ class TestAccountTransactionView(BaseWebTest):
 
     def test_empty_page(self):
         transaction_factory(account_debit=self.acct1,
-                            account_credit=self.acct2, amount="10.00")
+                            account_credit=self.acct2, amount="10.00",
+                            date=datetime.date(self.profile.year, 3, 6))
         url = "{0}?page=10".format(
             reverse("accounts.transaction.list.by_account",
                     args=[self.acct1.pk])

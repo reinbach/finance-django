@@ -1,10 +1,11 @@
 import datetime
 
 from django.contrib.auth.models import User
+from django.core.cache import cache
 from django.core.urlresolvers import reverse
 from finance.core.models import Profile
 from mock import patch, Mock
-from tests.fixtures import BaseWebTest
+from tests.fixtures import BaseWebTest, account_factory, account_type_factory
 
 
 class TestHomeView(BaseWebTest):
@@ -109,6 +110,8 @@ class TestLogoutView(BaseWebTest):
 
 
 class TestProfileView(BaseWebTest):
+    csrf_checks = False
+
     def test_view(self):
         response = self.app.get(reverse("profile.home"), user=self.user)
         assert response.status_code == 200
@@ -137,3 +140,13 @@ class TestProfileView(BaseWebTest):
         response = form.submit()
         assert response.status_code == 200
         assert "is required" in response
+
+    def test_clear_cache(self):
+        acct_type = account_type_factory(profile=self.profile, yearly=True)
+        acct = account_factory(profile=self.profile, account_type=acct_type)
+        acct.balance()
+        assert cache.get(acct.cache_key) is not None
+        self.app.post(reverse("profile.home"),
+                      {"current_year": self.profile.year},
+                      user=self.user)
+        assert cache.get(acct.cache_key) is None

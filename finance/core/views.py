@@ -4,6 +4,7 @@ from django.contrib.auth import authenticate, login
 from django.core.urlresolvers import reverse, reverse_lazy
 from django.shortcuts import get_object_or_404
 from django.views.generic import TemplateView, FormView, UpdateView
+from finance.accounts.models import Account
 from finance.core.forms import RegisterForm, ContactForm
 from finance.core.models import Profile
 from finance.core.utils import get_year_choices
@@ -66,6 +67,10 @@ class ProfileView(UpdateView):
 
     def form_valid(self, form):
         response = super(ProfileView, self).form_valid(form)
+        # clear cache of related accounts
+        for acct in Account.objects.filter(profile=self.object,
+                                           account_type__yearly=True):
+            acct.clear_cache()
         messages.success(self.request, "Successfully updated current year"
                          " to {0}".format(form.cleaned_data["current_year"]))
         return response
