@@ -73,6 +73,10 @@
             var block_width = 0;
             var block_height = - (height / 4);
 
+            height_needed = (height / 2) * Math.ceil(months.length / 2);
+            svg.attr("height",
+                     d3.max([height_needed, height]));
+
             for (var i in months) {
                 color.domain([
                     d3.min(data[months[i]], function(d) { return d.balance; }),
@@ -100,7 +104,8 @@
 
                 // add title
                 pie_chart.append("text")
-                    .attr("transform", "translate(0, -" + (height / 4 - 20) + ")")
+                    .attr("transform",
+                          "translate(0, -" + (height / 4 - 20) + ")")
                     .attr("dy", "1em")
                     .style("text-anchor", "middle")
                     .text(month_display(months[i]));
