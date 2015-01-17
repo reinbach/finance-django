@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load staticfiles %}
 
 {% block page-content %}
   {{ block.super }}
@@ -26,132 +27,105 @@
     </div>
   </div>
 
-  <h2 class="sub-header">Section title</h2>
+  <h2 class="sub-header">Monthly Expenses</h2>
   <div class="table-responsive">
-    <table class="table table-striped">
-      <thead>
-        <tr>
-          <th>#</th>
-          <th>Header</th>
-          <th>Header</th>
-          <th>Header</th>
-          <th>Header</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>1,001</td>
-          <td>Lorem</td>
-          <td>ipsum</td>
-          <td>dolor</td>
-          <td>sit</td>
-        </tr>
-        <tr>
-          <td>1,002</td>
-          <td>amet</td>
-          <td>consectetur</td>
-          <td>adipiscing</td>
-          <td>elit</td>
-        </tr>
-        <tr>
-          <td>1,003</td>
-          <td>Integer</td>
-          <td>nec</td>
-          <td>odio</td>
-          <td>Praesent</td>
-        </tr>
-        <tr>
-          <td>1,003</td>
-          <td>libero</td>
-          <td>Sed</td>
-          <td>cursus</td>
-          <td>ante</td>
-        </tr>
-        <tr>
-          <td>1,004</td>
-          <td>dapibus</td>
-          <td>diam</td>
-          <td>Sed</td>
-          <td>nisi</td>
-        </tr>
-        <tr>
-          <td>1,005</td>
-          <td>Nulla</td>
-          <td>quis</td>
-          <td>sem</td>
-          <td>at</td>
-        </tr>
-        <tr>
-          <td>1,006</td>
-          <td>nibh</td>
-          <td>elementum</td>
-          <td>imperdiet</td>
-          <td>Duis</td>
-        </tr>
-        <tr>
-          <td>1,007</td>
-          <td>sagittis</td>
-          <td>ipsum</td>
-          <td>Praesent</td>
-          <td>mauris</td>
-        </tr>
-        <tr>
-          <td>1,008</td>
-          <td>Fusce</td>
-          <td>nec</td>
-          <td>tellus</td>
-          <td>sed</td>
-        </tr>
-        <tr>
-          <td>1,009</td>
-          <td>augue</td>
-          <td>semper</td>
-          <td>porta</td>
-          <td>Mauris</td>
-        </tr>
-        <tr>
-          <td>1,010</td>
-          <td>massa</td>
-          <td>Vestibulum</td>
-          <td>lacinia</td>
-          <td>arcu</td>
-        </tr>
-        <tr>
-          <td>1,011</td>
-          <td>eget</td>
-          <td>nulla</td>
-          <td>Class</td>
-          <td>aptent</td>
-        </tr>
-        <tr>
-          <td>1,012</td>
-          <td>taciti</td>
-          <td>sociosqu</td>
-          <td>ad</td>
-          <td>litora</td>
-        </tr>
-        <tr>
-          <td>1,013</td>
-          <td>torquent</td>
-          <td>per</td>
-          <td>conubia</td>
-          <td>nostra</td>
-        </tr>
-        <tr>
-          <td>1,014</td>
-          <td>per</td>
-          <td>inceptos</td>
-          <td>himenaeos</td>
-          <td>Curabitur</td>
-        </tr>
-        <tr>
-          <td>1,015</td>
-          <td>sodales</td>
-          <td>ligula</td>
-          <td>in</td>
-          <td>libero</td>
-        </tr>
-      </tbody>
-    </table>
+    <div id="monthly-debit-charts"></div>
   </div>
 {% endblock page-content %}
+
+{% block page-js %}
+  <script src="{% static 'js/d3.min.js' %}"></script>
+  <script>
+    $(function() {
+        var width = 800,
+            height = 800;
+
+        var color = d3.scale.linear()
+            .range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b",
+                    "#a05d56", "#d0743c", "#ff8c00"]);
+
+        var pie = d3.layout.pie()
+            .sort(null)
+            .value(function(d) {
+                return d.balance;
+            });
+
+        var month_display = d3.scale.quantize()
+            .range(["Janurary", "February", "March", "April", "May", "June",
+                    "July", "August", "September", "October", "November",
+                    "December"])
+            .domain([1,12]);
+
+        var svg = d3.select("#monthly-debit-charts").append("svg")
+            .attr("width", width)
+            .attr("height", height)
+
+        var key = function(d) { return d.data.label; };
+
+        d3.json("{% url 'data.yearly_debit' %}", function(error, data) {
+            var months = d3.keys(data);
+            var radius = Math.min(width, height) / 4 - 40;
+
+            var arc = d3.svg.arc()
+                .outerRadius(radius - 10)
+                .innerRadius(0);
+
+            var block_width = 0;
+            var block_height = - (height / 4);
+
+            for (var i in months) {
+                color.domain([
+                    d3.min(data[months[i]], function(d) { return d.balance; }),
+                    d3.max(data[months[i]], function(d) { return d.balance; })
+                ]);
+
+                // setup chart block dimensions
+                odd = i % 2;
+                if (odd) {
+                    block_width = width / 4 * 3;
+                } else {
+                    block_width = width / 4;
+                    block_height = block_height + height / 2;
+                }
+
+                // create pie chart block
+                pie_chart = svg.append("g")
+                    .attr(
+                        "transform",
+                        "translate(" + block_width + "," + block_height + ")"
+                    )
+                    .selectAll(".arc")
+                    .data(pie(data[months[i]]), key)
+                    .enter()
+
+                // add title
+                pie_chart.append("text")
+                    .attr("transform", "translate(0, -" + (height / 4 - 20) + ")")
+                    .attr("dy", "1em")
+                    .style("text-anchor", "middle")
+                    .text(month_display(months[i]));
+
+                // create pie chart
+                pie_chart.append("g")
+                    .attr("class", "arc")
+                    .append("path")
+                    .attr("d", arc)
+                    .style("fill", function(d) {
+                        return color(d.value);
+                    });
+
+                // add labels
+                pie_chart.append("text")
+                    .attr("transform", function(d) {
+                        return "translate(" + arc.centroid(d) + ")";
+                    })
+                    .attr("dy", ".35em")
+                    .style("text-anchor", "middle")
+                    .text(function(d) {
+                        return d.data.label + " (" + d.data.balance + ")";
+                    });
+            }
+        });
+    });
+  </script>
+{% endblock page-js %}

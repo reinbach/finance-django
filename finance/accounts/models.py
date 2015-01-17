@@ -31,6 +31,10 @@ class AccountQuerySet(models.QuerySet):
         for acct in self.yearly():
             acct.clear_cache()
 
+    def debits(self):
+        """Yearly accounts that are type DEBIT"""
+        return self.yearly().filter(account_type__default_type="DEBIT")
+
 
 class Account(models.Model):
     name = models.CharField(max_length=50)
@@ -75,7 +79,7 @@ class Account(models.Model):
     def subaccounts(self):
         return Account.objects.filter(parent=self)
 
-    def transactions(self):
+    def transactions(self, month=None):
         """Get all transactions associated with this account
 
         We want to clearly indicate the opposite account
@@ -84,7 +88,10 @@ class Account(models.Model):
         year = self.profile.year
         trxs = Transaction.objects.filter(
             Q(account_debit=self) | Q(account_credit=self)
-        ).filter(date__year=year).order_by("date")
+        ).filter(date__year=year)
+        if month is not None:
+            trxs = trxs.filter(date__month=month)
+        trxs = trxs.order_by("date")
         trx_list = []
         balance = 0
         for trx in trxs:

@@ -677,3 +677,45 @@ class TestTransactionImportView(BaseWebTest):
         response = form.submit().follow()
         assert response.status_code == 200
         assert "Successfully added 1 Transactions" in response
+
+
+class TestDataYearlyDebit(BaseWebTest):
+    def test_view(self):
+        acct_type1 = account_type_factory(profile=self.profile, yearly=True,
+                                          default_type="DEBIT")
+        acct_type2 = account_type_factory(profile=self.profile)
+        acct1 = account_factory(profile=self.profile, account_type=acct_type1)
+        acct2 = account_factory(profile=self.profile, account_type=acct_type2)
+        trx = transaction_factory(account_debit=acct1, account_credit=acct2,
+                                  amount=10.00,
+                                  date=datetime.date(self.profile.year, 5, 1))
+        response = self.app.get(reverse("data.yearly_debit"), user=self.user)
+        assert response.status_code == 200
+        res = json.loads(response.body)
+        assert res == {u"5": [{"label": acct1.name,
+                              "balance": u"{:.2f}".format(trx.amount)}]}
+
+    def test_view_empty(self):
+        response = self.app.get(reverse("data.yearly_debit"), user=self.user)
+        assert response.status_code == 200
+        res = json.loads(response.body)
+        assert res == {}
+
+    def test_permissions(self):
+        response = self.app.get(reverse("data.yearly_debit"))
+        assert response.status_code == 302
+
+    def test_isolation(self):
+        p = profile_factory()
+        acct_type1 = account_type_factory(profile=p, yearly=True,
+                                          default_type="DEBIT")
+        acct_type2 = account_type_factory(profile=p)
+        acct1 = account_factory(profile=p, account_type=acct_type1)
+        acct2 = account_factory(profile=p, account_type=acct_type2)
+        transaction_factory(account_debit=acct1, account_credit=acct2,
+                            amount=10.00,
+                            date=datetime.date(p.year, 5, 1))
+        response = self.app.get(reverse("data.yearly_debit"), user=self.user)
+        assert response.status_code == 200
+        res = json.loads(response.body)
+        assert res == {}

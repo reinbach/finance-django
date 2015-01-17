@@ -5,8 +5,9 @@ from django.http import JsonResponse
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.template.loader import render_to_string
-from django.views.generic import (TemplateView, CreateView, UpdateView,
+from django.views.generic import (TemplateView, CreateView, UpdateView, View,
                                   DeleteView, ListView, FormView, DetailView)
+from finance.accounts.dashboard import get_monthly_debits
 from finance.accounts.forms import (AccountTypeForm, TransactionImportForm,
                                     TransactionFormSet, AccountForm,
                                     TransactionImportFormSet)
@@ -369,3 +370,9 @@ class TransactionImportConfirmView(FormView):
                              import_trx_count
                          ))
         return super(TransactionImportConfirmView, self).form_valid(form)
+
+
+class DataYearlyDebit(View):
+    def get(self, request):
+        profile = get_user_profile(request.user)
+        return JsonResponse(get_monthly_debits(profile))

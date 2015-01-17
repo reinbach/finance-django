@@ -1,14 +1,12 @@
 from django.conf.urls import patterns, url
 from django.contrib.auth.decorators import login_required
-from finance.accounts.views import (DashboardView, SettingsView,
-                                    AccountTypeAddView, AccountTypeEditView,
-                                    AccountTypeDeleteView, AccountView,
-                                    AccountAddView, AccountEditView,
-                                    AccountDeleteView, AccountTransactionView,
-                                    TransactionAddView, TransactionEditView,
-                                    TransactionDeleteView,
-                                    TransactionImportView,
-                                    TransactionImportConfirmView)
+from finance.accounts.views import (
+    DashboardView, SettingsView, AccountTypeAddView, AccountTypeEditView,
+    AccountTypeDeleteView, AccountView, AccountAddView, AccountEditView,
+    AccountDeleteView, AccountTransactionView, TransactionAddView,
+    TransactionEditView, TransactionDeleteView, TransactionImportView,
+    TransactionImportConfirmView, DataYearlyDebit
+)
 
 
 urlpatterns = patterns(
@@ -17,6 +15,11 @@ urlpatterns = patterns(
         name="accounts.dashboard"),
     url("^settings/$", login_required(SettingsView.as_view()),
         name="accounts.settings"),
+
+    # data
+    url ("^data/yearly/debit/$",
+         login_required(DataYearlyDebit.as_view()),
+         name="data.yearly_debit"),
 
     # account types
     url("^settings/account_type/add/$",
