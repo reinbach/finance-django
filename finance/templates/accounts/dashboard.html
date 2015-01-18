@@ -37,7 +37,7 @@
   <script src="{% static 'js/d3.min.js' %}"></script>
   <script>
     $(function() {
-        var width = 800,
+        var width = 1200,
             height = 800;
 
         var color = d3.scale.linear()
@@ -70,7 +70,6 @@
                 .outerRadius(radius - 10)
                 .innerRadius(0);
 
-            var block_width = 0;
             var block_height = - (height / 4);
 
             height_needed = (height / 2) * Math.ceil(months.length / 2);
@@ -84,12 +83,23 @@
                 ]);
 
                 // setup chart block dimensions
-                odd = i % 2;
-                if (odd) {
-                    block_width = width / 4 * 3;
-                } else {
-                    block_width = width / 4;
+                // at most 12 months
+                var block_width = 0;
+                if (i % 3 == 0) {
+                    block_width = width / 6;
                     block_height = block_height + height / 2;
+                } else {
+                    switch (i) {
+                    case "1":
+                    case "4":
+                    case "7":
+                    case "10":
+                        block_width = width / 2;
+                        break;
+                    default:
+                        block_width = (width / 6) * 5;
+                        break;
+                    }
                 }
 
                 // create pie chart block
