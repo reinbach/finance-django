@@ -3,33 +3,25 @@
 
 {% block page-content %}
   {{ block.super }}
-
-  <div class="row placeholders">
-    <div class="col-xs-6 col-sm-3 placeholder">
-      <img data-src="holder.js/200x200/auto/sky" class="img-responsive" alt="Generic placeholder thumbnail">
-      <h4>Label</h4>
-      <span class="text-muted">Something else</span>
-    </div>
-    <div class="col-xs-6 col-sm-3 placeholder">
-      <img data-src="holder.js/200x200/auto/vine" class="img-responsive" alt="Generic placeholder thumbnail">
-      <h4>Label</h4>
-      <span class="text-muted">Something else</span>
-    </div>
-    <div class="col-xs-6 col-sm-3 placeholder">
-      <img data-src="holder.js/200x200/auto/sky" class="img-responsive" alt="Generic placeholder thumbnail">
-      <h4>Label</h4>
-      <span class="text-muted">Something else</span>
-    </div>
-    <div class="col-xs-6 col-sm-3 placeholder">
-      <img data-src="holder.js/200x200/auto/vine" class="img-responsive" alt="Generic placeholder thumbnail">
-      <h4>Label</h4>
-      <span class="text-muted">Something else</span>
+  <h2 class="sub-header">Net Worth</h2>
+  <div class="table-responsive">
+    <div id="net-worth-chart">
+      <img id="net-worth-chart-loader" src="{% static 'img/ajax-loader.gif' %}" />
     </div>
   </div>
 
-  <h2 class="sub-header">Monthly Expenses</h2>
+  <h2 class="sub-header">Debits vs Credits</h2>
   <div class="table-responsive">
-    <div id="monthly-debit-charts"></div>
+    <div id="debit-vs-credits-chart">
+      <img id="debit-vs-credits-chart-loader" src="{% static 'img/ajax-loader.gif' %}" />
+    </div>
+  </div>
+
+  <h2 class="sub-header">Monthly Debits</h2>
+  <div class="table-responsive">
+    <div id="monthly-debit-charts">
+      <img id="monthly-debit-charts-loader" src="{% static 'img/ajax-loader.gif' %}" />
+    </div>
   </div>
 {% endblock page-content %}
 
@@ -38,30 +30,32 @@
   <script src="{% static 'js/colors.js' %}"></script>
   <script>
     $(function() {
-        var width = 1200,
-            height = 800;
-
-        var pie = d3.layout.pie()
-            .sort(null)
-            .value(function(d) {
-                return d.balance;
-            });
-
-        var month_display = d3.scale.quantize()
-            .range(["Janurary", "February", "March", "April", "May", "June",
-                    "July", "August", "September", "October", "November",
-                    "December"])
-            .domain([1,12]);
-
-        var svg = d3.select("#monthly-debit-charts").append("svg")
-            .attr("width", width)
-            .attr("height", height)
-
-        var key = function(d) {
-            return window.btoa(d.data.label).replace(/=/g, "");
-        };
-
         d3.json("{% url 'data.yearly_debit' %}", function(error, data) {
+            $("#monthly-debit-charts-loader").hide();
+
+            var width = 1200,
+                height = 800;
+
+            var pie = d3.layout.pie()
+                .sort(null)
+                .value(function(d) {
+                    return d.balance;
+                });
+
+            var month_display = d3.scale.quantize()
+                .range(["Janurary", "February", "March", "April", "May",
+                        "June", "July", "August", "September", "October",
+                        "November", "December"])
+                .domain([1,12]);
+
+            var svg = d3.select("#monthly-debit-charts").append("svg")
+                .attr("width", width)
+                .attr("height", height)
+
+            var key = function(d) {
+                return window.btoa(d.data.label).replace(/=/g, "");
+            };
+
             var months = d3.keys(data);
             var radius = Math.min(width, height) / 4 - 40;
 
