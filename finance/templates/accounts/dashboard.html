@@ -35,14 +35,11 @@
 
 {% block page-js %}
   <script src="{% static 'js/d3.min.js' %}"></script>
+  <script src="{% static 'js/colors.js' %}"></script>
   <script>
     $(function() {
         var width = 1200,
             height = 800;
-
-        var color = d3.scale.linear()
-            .range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b",
-                    "#a05d56", "#d0743c", "#ff8c00"]);
 
         var pie = d3.layout.pie()
             .sort(null)
@@ -61,7 +58,7 @@
             .attr("height", height)
 
         var key = function(d) {
-            return d.data.label;
+            return window.btoa(d.data.label).replace(/=/g, "");
         };
 
         d3.json("{% url 'data.yearly_debit' %}", function(error, data) {
@@ -79,10 +76,16 @@
                      d3.max([height_needed, height]));
 
             for (var i in months) {
-                color.domain([
-                    d3.min(data[months[i]], function(d) { return d.balance; }),
-                    d3.max(data[months[i]], function(d) { return d.balance; })
-                ]);
+                var color = d3.scale.ordinal()
+                    .range(colors.slice(10, 10 + data[months[i]].length))
+                    .domain([
+                        d3.min(data[months[i]], function(d) {
+                            return d.balance;
+                        }),
+                        d3.max(data[months[i]], function(d) {
+                            return d.balance;
+                        })
+                    ]);
 
                 // setup chart block dimensions
                 // at most 12 months
