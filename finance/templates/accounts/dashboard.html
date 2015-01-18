@@ -60,7 +60,9 @@
             .attr("width", width)
             .attr("height", height)
 
-        var key = function(d) { return d.data.label; };
+        var key = function(d) {
+            return d.data.label;
+        };
 
         d3.json("{% url 'data.yearly_debit' %}", function(error, data) {
             var months = d3.keys(data);
@@ -103,34 +105,45 @@
                 }
 
                 // create pie chart block
-                pie_chart = svg.append("g")
+                block = svg.append("g")
                     .attr(
                         "transform",
                         "translate(" + block_width + "," + block_height + ")"
                     )
-                    .selectAll(".arc")
-                    .data(pie(data[months[i]]), key)
-                    .enter()
 
                 // add title
-                pie_chart.append("text")
+                block.append("text")
                     .attr("transform",
                           "translate(0, -" + (height / 4 - 20) + ")")
                     .attr("dy", "1em")
                     .style("text-anchor", "middle")
                     .text(month_display(months[i]));
 
+                slices = block.selectAll(".arc")
+                    .data(pie(data[months[i]]))
+                    .enter()
+
                 // create pie chart
-                pie_chart.append("g")
+                slices.append("g")
                     .attr("class", "arc")
                     .append("path")
                     .attr("d", arc)
                     .style("fill", function(d) {
                         return color(d.value);
+                    })
+                    .on("mouseover", function(d) {
+                        $("." + key(d)).show();
+                    })
+                    .on("mouseout", function(d) {
+                        $("." + key(d)).hide();
                     });
 
-                // add labels
-                pie_chart.append("text")
+
+                // create label
+                slices.append("text")
+                    .attr("class", function(d) {
+                        return key(d);
+                    })
                     .attr("transform", function(d) {
                         return "translate(" + arc.centroid(d) + ")";
                     })
