@@ -80,10 +80,10 @@
                     .range(colors.slice(10, 10 + data[months[i]].length))
                     .domain([
                         d3.min(data[months[i]], function(d) {
-                            return d.balance;
+                            return d.label;
                         }),
                         d3.max(data[months[i]], function(d) {
-                            return d.balance;
+                            return d.label;
                         })
                     ]);
 
