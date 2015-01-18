@@ -150,8 +150,10 @@
                     .attr("dy", ".35em")
                     .style("text-anchor", "middle")
                     .text(function(d) {
+                        $("." + key(d)).hide();
                         return d.data.label + " (" + d.data.balance + ")";
                     });
+
             }
         });
     });
