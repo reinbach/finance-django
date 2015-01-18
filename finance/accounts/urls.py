@@ -17,9 +17,9 @@ urlpatterns = patterns(
         name="accounts.settings"),
 
     # data
-    url ("^data/yearly/debit/$",
-         login_required(DataYearlyDebit.as_view()),
-         name="data.yearly_debit"),
+    url("^data/yearly/debit/$",
+        login_required(DataYearlyDebit.as_view()),
+        name="data.yearly_debit"),
 
     # account types
     url("^settings/account_type/add/$",
