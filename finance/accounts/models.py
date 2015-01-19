@@ -4,6 +4,17 @@ from django.db.models import Q
 from finance.core.models import Profile
 
 
+class AccountTypeQuerySet(models.QuerySet):
+    def yearly(self):
+        return self.filter(yearly=True)
+
+    def debits(self):
+        return self.yearly().filter(default_type="DEBIT")
+
+    def credits(self):
+        return self.yearly().filter(default_type="CREDIT")
+
+
 class AccountType(models.Model):
     TYPE_CHOICES = (
         ("DEBIT", "Debit"),
@@ -14,6 +25,8 @@ class AccountType(models.Model):
                                     default="DEBIT")
     yearly = models.BooleanField(default=False)
     profile = models.ForeignKey(Profile)
+
+    objects = AccountTypeQuerySet.as_manager()
 
     class Meta:
         ordering = ["name"]

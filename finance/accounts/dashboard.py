@@ -1,7 +1,7 @@
 import datetime
 
 from collections import defaultdict
-from finance.accounts.models import Account
+from finance.accounts.models import Account, AccountType
 
 
 def get_months(year):
@@ -34,3 +34,15 @@ def get_monthly_debits(profile):
                         {"label": debit.name, "balance": trx.balance}
                     )
     return monthly_debits
+
+
+def get_debits_title(profile):
+    return "/".join([x.name for x in AccountType.objects.filter(
+        profile=profile
+    ).debits()])
+
+
+def get_credits_title(profile):
+    return "/".join([x.name for x in AccountType.objects.filter(
+        profile=profile
+    ).credits()])

@@ -7,7 +7,8 @@ from django.template import RequestContext
 from django.template.loader import render_to_string
 from django.views.generic import (TemplateView, CreateView, UpdateView, View,
                                   DeleteView, ListView, FormView, DetailView)
-from finance.accounts.dashboard import get_monthly_debits
+from finance.accounts.dashboard import (get_monthly_debits, get_debits_title,
+                                        get_credits_title)
 from finance.accounts.forms import (AccountTypeForm, TransactionImportForm,
                                     TransactionFormSet, AccountForm,
                                     TransactionImportFormSet)
@@ -23,6 +24,9 @@ class DashboardView(TemplateView):
     def get_context_data(self, **kwargs):
         kwargs = super(DashboardView, self).get_context_data(**kwargs)
         kwargs["page"] = "dashboard"
+        profile = get_user_profile(self.request.user)
+        kwargs["debits_title"] = get_debits_title(profile)
+        kwargs["credits_title"] = get_credits_title(profile)
         return kwargs
 
 

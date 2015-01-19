@@ -7,10 +7,36 @@ from tests.fixtures import (account_factory, account_type_factory,
                             transaction_factory, profile_factory)
 
 
+@pytest.mark.django_db
 class TestAccountType():
     def test_unicode(self):
         a = AccountType(name="acct-type")
         assert unicode(a) == "acct-type"
+
+    def test_yearly(self):
+        at1 = account_type_factory(yearly=True)
+        at2 = account_type_factory(yearly=False)
+        at_list = AccountType.objects.yearly()
+        assert at1 in at_list
+        assert at2 not in at_list
+
+    def test_debits(self):
+        at1 = account_type_factory(yearly=True, default_type="DEBIT")
+        at2 = account_type_factory(yearly=True, default_type="CREDIT")
+        at3 = account_type_factory(yearly=False, default_type="DEBIT")
+        at_list = AccountType.objects.debits()
+        assert at1 in at_list
+        assert at2 not in at_list
+        assert at3 not in at_list
+
+    def test_credits(self):
+        at1 = account_type_factory(yearly=True, default_type="DEBIT")
+        at2 = account_type_factory(yearly=True, default_type="CREDIT")
+        at3 = account_type_factory(yearly=False, default_type="CREDIT")
+        at_list = AccountType.objects.credits()
+        assert at1 not in at_list
+        assert at2 in at_list
+        assert at3 not in at_list
 
 
 @pytest.mark.django_db
