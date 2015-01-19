@@ -48,6 +48,10 @@ class AccountQuerySet(models.QuerySet):
         """Yearly accounts that are type DEBIT"""
         return self.yearly().filter(account_type__default_type="DEBIT")
 
+    def credits(self):
+        """Yearly accounts that are type CREDIT"""
+        return self.yearly().filter(account_type__default_type="CREDIT")
+
 
 class Account(models.Model):
     name = models.CharField(max_length=50)

@@ -15,25 +15,28 @@ def get_months(year):
     return [i for i in range(1, month_count + 1)]
 
 
-def get_monthly_debits(profile):
-    """Totals for the debit accounts broken into the months
+def get_monthly_totals(profile, debits=True):
+    """Totals for the accounts broken into the months
     of the selected year
     """
-    debits = Account.objects.filter(profile=profile).debits()
-    monthly_debits = defaultdict(dict)
-    month_debit_covered = []
+    if debits:
+        accounts = Account.objects.filter(profile=profile).debits()
+    else:
+        accounts = Account.objects.filter(profile=profile).credits()
+    monthly_accounts = defaultdict(dict)
+    month_account_covered = []
     months = get_months(profile.year)
-    for debit in debits:
+    for acct in accounts:
         for month in months:
-            for trx in debit.transactions(month=month):
-                if trx.date.month not in monthly_debits:
-                    monthly_debits[trx.date.month] = []
-                if (trx.date.month, debit.name) not in month_debit_covered:
-                    month_debit_covered.append((trx.date.month, debit.name))
-                    monthly_debits[trx.date.month].append(
-                        {"label": debit.name, "balance": trx.balance}
+            for trx in acct.transactions(month=month):
+                if trx.date.month not in monthly_accounts:
+                    monthly_accounts[trx.date.month] = []
+                if (trx.date.month, acct.name) not in month_account_covered:
+                    month_account_covered.append((trx.date.month, acct.name))
+                    monthly_accounts[trx.date.month].append(
+                        {"label": acct.name, "balance": trx.balance}
                     )
-    return monthly_debits
+    return monthly_accounts
 
 
 def get_debits_title(profile):
@@ -46,3 +49,19 @@ def get_credits_title(profile):
     return "/".join([x.name for x in AccountType.objects.filter(
         profile=profile
     ).credits()])
+
+
+def get_monthly_debits_vs_credits(profile):
+    monthly_debits = get_monthly_totals(profile)
+    monthly_credits = get_monthly_totals(profile, False)
+    months = get_months(profile.year)
+    monthly_totals = []
+    for month in months:
+        debit_total = sum(monthly_debits.get("month", {}).get("balances", []))
+        credit_total = sum(monthly_credits.get("month", {}).get("balances", []))
+        monthly_totals.append((month, debit_total + credit_total))
+    return monthly_totals
+
+
+def get_networth(profile):
+    pass
