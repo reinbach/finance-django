@@ -57,8 +57,10 @@ def get_monthly_debits_vs_credits(profile):
     months = get_months(profile.year)
     monthly_totals = []
     for month in months:
-        debit_total = sum(monthly_debits.get("month", {}).get("balances", []))
-        credit_total = sum(monthly_credits.get("month", {}).get("balances", []))
+        debits = monthly_debits.get(month, [])
+        debit_total = sum([x.get("balance", 0) for x in debits])
+        credits = monthly_credits.get(month, [])
+        credit_total = sum([x.get("balance", 0) for x in credits])
         monthly_totals.append((month, debit_total + credit_total))
     return monthly_totals
 

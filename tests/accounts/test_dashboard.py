@@ -29,68 +29,72 @@ class TestGetMonthlyAccounts():
 
     def test_debit_single_trx(self):
         p = profile_factory()
-        acct_type1 = account_type_factory(profile=p, yearly=True,
-                                          default_type="DEBIT")
-        acct_type2 = account_type_factory(profile=p)
-        acct1 = account_factory(profile=p, account_type=acct_type1)
-        acct2 = account_factory(profile=p, account_type=acct_type2)
-        trx = transaction_factory(account_debit=acct1, account_credit=acct2,
+        expense_type = account_type_factory(profile=p, yearly=True,
+                                            default_type="DEBIT")
+        asset_type = account_type_factory(profile=p)
+        exp = account_factory(profile=p, account_type=expense_type)
+        bank = account_factory(profile=p, account_type=asset_type)
+        trx = transaction_factory(account_debit=exp, account_credit=bank,
                                   amount=10.00,
                                   date=datetime.date(p.year, 5, 1))
         trxs = get_monthly_totals(p)
         assert len(trxs) == 1
-        assert trxs[5] == [{"label": acct1.name, "balance": trx.amount}]
+        assert trxs[5] == [{"label": exp.name, "balance": trx.amount}]
 
     def test_debit_multiple_trx(self):
         p = profile_factory()
-        acct_type1 = account_type_factory(profile=p, yearly=True,
-                                          default_type="DEBIT")
-        acct_type2 = account_type_factory(profile=p)
-        acct1 = account_factory(profile=p, account_type=acct_type1)
-        acct2 = account_factory(profile=p, account_type=acct_type2)
-        trx1 = transaction_factory(account_debit=acct1, account_credit=acct2,
+        expense_type = account_type_factory(profile=p, yearly=True,
+                                        default_type="DEBIT")
+        asset_type = account_type_factory(profile=p)
+        exp = account_factory(profile=p, account_type=expense_type)
+        bank = account_factory(profile=p, account_type=asset_type)
+        trx1 = transaction_factory(account_debit=exp, account_credit=bank,
                                    amount=10.00,
                                    date=datetime.date(p.year, 5, 1))
-        trx2 = transaction_factory(account_debit=acct1, account_credit=acct2,
+        trx2 = transaction_factory(account_debit=exp, account_credit=bank,
                                    amount=20.00,
+                                   date=datetime.date(p.year, 5, 2))
+        trx3 = transaction_factory(account_debit=bank, account_credit=exp,
+                                   amount=5.00,
                                    date=datetime.date(p.year, 5, 2))
         trxs = get_monthly_totals(p)
         assert len(trxs) == 1
         assert trxs[5] == [
-            {"label": acct1.name, "balance": trx1.amount + trx2.amount}
+            {"label": exp.name,
+             "balance": trx1.amount + trx2.amount - trx3.amount}
         ]
 
     def test_debit_multiple(self):
         p = profile_factory()
-        acct_type1 = account_type_factory(profile=p, yearly=True,
+        expense_type = account_type_factory(profile=p, yearly=True,
                                           default_type="DEBIT")
-        acct_type2 = account_type_factory(profile=p)
-        acct1 = account_factory(profile=p, account_type=acct_type1)
-        acct2 = account_factory(profile=p, account_type=acct_type2)
-        acct3 = account_factory(profile=p, account_type=acct_type1)
-        trx1 = transaction_factory(account_debit=acct1, account_credit=acct2,
+        asset_type = account_type_factory(profile=p)
+        bank = account_factory(profile=p, account_type=asset_type)
+        exp1 = account_factory(profile=p, account_type=expense_type)
+        exp2 = account_factory(profile=p, account_type=expense_type)
+        trx1 = transaction_factory(account_debit=exp1, account_credit=bank,
                                    amount=10.00,
                                    date=datetime.date(p.year, 5, 1))
-        trx2 = transaction_factory(account_debit=acct3, account_credit=acct2,
+        trx2 = transaction_factory(account_debit=exp2, account_credit=bank,
                                    amount=20.00,
                                    date=datetime.date(p.year, 5, 2))
-        trx3 = transaction_factory(account_debit=acct2, account_credit=acct3,
+        trx3 = transaction_factory(account_debit=bank, account_credit=exp2,
                                    amount=15.00,
                                    date=datetime.date(p.year, 5, 20))
-        trx4 = transaction_factory(account_debit=acct1, account_credit=acct2,
+        trx4 = transaction_factory(account_debit=exp1, account_credit=bank,
                                    amount=12.00,
                                    date=datetime.date(p.year, 8, 2))
-        trx5 = transaction_factory(account_debit=acct1, account_credit=acct2,
+        trx5 = transaction_factory(account_debit=exp1, account_credit=bank,
                                    amount=28.00,
                                    date=datetime.date(p.year, 8, 12))
         trxs = get_monthly_totals(p)
         assert len(trxs) == 2
         assert trxs[5] == [
-            {"label": acct3.name, "balance": trx2.amount - trx3.amount},
-            {"label": acct1.name, "balance": trx1.amount}
+            {"label": exp1.name, "balance": trx1.amount},
+            {"label": exp2.name, "balance": trx2.amount - trx3.amount}
         ]
         assert trxs[8] == [
-            {"label": acct1.name, "balance": trx4.amount + trx5.amount},
+            {"label": exp1.name, "balance": trx4.amount + trx5.amount},
         ]
 
     def test_credit_empty(self):
@@ -99,68 +103,68 @@ class TestGetMonthlyAccounts():
 
     def test_credit_single_trx(self):
         p = profile_factory()
-        acct_type1 = account_type_factory(profile=p, yearly=True,
+        income_type = account_type_factory(profile=p, yearly=True,
                                           default_type="CREDIT")
-        acct_type2 = account_type_factory(profile=p)
-        acct1 = account_factory(profile=p, account_type=acct_type1)
-        acct2 = account_factory(profile=p, account_type=acct_type2)
-        trx = transaction_factory(account_debit=acct2, account_credit=acct1,
+        asset_type = account_type_factory(profile=p)
+        inc = account_factory(profile=p, account_type=income_type)
+        bank = account_factory(profile=p, account_type=asset_type)
+        trx = transaction_factory(account_debit=bank, account_credit=inc,
                                   amount=10.00,
                                   date=datetime.date(p.year, 5, 1))
         trxs = get_monthly_totals(p, False)
         assert len(trxs) == 1
-        assert trxs[5] == [{"label": acct1.name, "balance": -trx.amount}]
+        assert trxs[5] == [{"label": inc.name, "balance": -trx.amount}]
 
     def test_credit_multiple_trx(self):
         p = profile_factory()
-        acct_type1 = account_type_factory(profile=p, yearly=True,
+        income_type = account_type_factory(profile=p, yearly=True,
                                           default_type="CREDIT")
-        acct_type2 = account_type_factory(profile=p)
-        acct1 = account_factory(profile=p, account_type=acct_type1)
-        acct2 = account_factory(profile=p, account_type=acct_type2)
-        trx1 = transaction_factory(account_debit=acct2, account_credit=acct1,
+        asset_type = account_type_factory(profile=p)
+        inc = account_factory(profile=p, account_type=income_type)
+        bank = account_factory(profile=p, account_type=asset_type)
+        trx1 = transaction_factory(account_debit=bank, account_credit=inc,
                                    amount=10.00,
                                    date=datetime.date(p.year, 5, 1))
-        trx2 = transaction_factory(account_debit=acct2, account_credit=acct1,
+        trx2 = transaction_factory(account_debit=bank, account_credit=inc,
                                    amount=20.00,
                                    date=datetime.date(p.year, 5, 2))
         trxs = get_monthly_totals(p, False)
         assert len(trxs) == 1
         assert trxs[5] == [
-            {"label": acct1.name, "balance": -trx1.amount - trx2.amount}
+            {"label": inc.name, "balance": -trx1.amount - trx2.amount}
         ]
 
     def test_credit_multiple(self):
         p = profile_factory()
-        acct_type1 = account_type_factory(profile=p, yearly=True,
+        income_type = account_type_factory(profile=p, yearly=True,
                                           default_type="CREDIT")
-        acct_type2 = account_type_factory(profile=p)
-        acct1 = account_factory(profile=p, account_type=acct_type1)
-        acct2 = account_factory(profile=p, account_type=acct_type2)
-        acct3 = account_factory(profile=p, account_type=acct_type1)
-        trx1 = transaction_factory(account_debit=acct2, account_credit=acct1,
+        asset_type = account_type_factory(profile=p)
+        bank = account_factory(profile=p, account_type=asset_type)
+        inc1 = account_factory(profile=p, account_type=income_type)
+        inc2 = account_factory(profile=p, account_type=income_type)
+        trx1 = transaction_factory(account_debit=bank, account_credit=inc1,
                                    amount=10.00,
                                    date=datetime.date(p.year, 5, 1))
-        trx2 = transaction_factory(account_debit=acct2, account_credit=acct3,
+        trx2 = transaction_factory(account_debit=bank, account_credit=inc2,
                                    amount=20.00,
                                    date=datetime.date(p.year, 5, 2))
-        trx3 = transaction_factory(account_debit=acct3, account_credit=acct2,
+        trx3 = transaction_factory(account_debit=inc2, account_credit=bank,
                                    amount=15.00,
                                    date=datetime.date(p.year, 5, 20))
-        trx4 = transaction_factory(account_debit=acct2, account_credit=acct1,
+        trx4 = transaction_factory(account_debit=bank, account_credit=inc1,
                                    amount=12.00,
                                    date=datetime.date(p.year, 8, 2))
-        trx5 = transaction_factory(account_debit=acct2, account_credit=acct1,
+        trx5 = transaction_factory(account_debit=bank, account_credit=inc1,
                                    amount=28.00,
                                    date=datetime.date(p.year, 8, 12))
         trxs = get_monthly_totals(p, False)
         assert len(trxs) == 2
         assert trxs[5] == [
-            {"label": acct1.name, "balance": -trx1.amount},
-            {"label": acct3.name, "balance": -trx2.amount + trx3.amount}
+            {"label": inc1.name, "balance": -trx1.amount},
+            {"label": inc2.name, "balance": -trx2.amount + trx3.amount}
         ]
         assert trxs[8] == [
-            {"label": acct1.name, "balance": -trx4.amount - trx5.amount},
+            {"label": inc1.name, "balance": -trx4.amount - trx5.amount},
         ]
 
 
@@ -236,3 +240,33 @@ class TestMonthlyDebitsVsCredits():
         assert get_monthly_debits_vs_credits(p) == [
             (x, 0) for x in range(1, 13)
         ]
+
+    def test_totals(self):
+        p = profile_factory(current_year=2010)
+        expense_type = account_type_factory(profile=p, yearly=True,
+                                        default_type="DEBIT")
+        income_type = account_type_factory(profile=p, yearly=True,
+                                        default_type="CREDIT")
+        asset_type = account_type_factory(profile=p)
+        bank = account_factory(profile=p, account_type=asset_type)
+        inc1 = account_factory(profile=p, account_type=income_type)
+        inc2 = account_factory(profile=p, account_type=income_type)
+        exp1 = account_factory(profile=p, account_type=expense_type)
+        exp2 = account_factory(profile=p, account_type=expense_type)
+        transaction_factory(account_debit=bank, account_credit=inc1,
+                            amount=100.00, date=datetime.date(2010, 1, 1))
+        transaction_factory(account_debit=bank, account_credit=inc2,
+                            amount=10.00, date=datetime.date(2010, 1, 4))
+        transaction_factory(account_debit=exp1, account_credit=bank,
+                            amount=15.00, date=datetime.date(2010, 1, 6))
+        transaction_factory(account_debit=exp2, account_credit=bank,
+                            amount=20.00, date=datetime.date(2010, 1, 13))
+        transaction_factory(account_debit=exp2, account_credit=bank,
+                            amount=25.00, date=datetime.date(2010, 1, 16))
+        transaction_factory(account_debit=exp1, account_credit=bank,
+                            amount=30.00, date=datetime.date(2010, 2, 1))
+        transaction_factory(account_debit=exp1, account_credit=bank,
+                            amount=35.00, date=datetime.date(2011, 2, 1))
+        monthly_debits_credits = get_monthly_debits_vs_credits(p)
+        assert (1, -50) in monthly_debits_credits
+        assert (2, 30) in monthly_debits_credits
