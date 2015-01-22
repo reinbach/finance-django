@@ -90,8 +90,8 @@ class TestGetMonthlyAccounts():
         trxs = get_monthly_totals(p)
         assert len(trxs) == 2
         assert trxs[5] == [
-            {"label": exp1.name, "balance": trx1.amount},
-            {"label": exp2.name, "balance": trx2.amount - trx3.amount}
+            {"label": exp2.name, "balance": trx2.amount - trx3.amount},
+            {"label": exp1.name, "balance": trx1.amount}
         ]
         assert trxs[8] == [
             {"label": exp1.name, "balance": trx4.amount + trx5.amount},

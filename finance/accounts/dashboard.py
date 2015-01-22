@@ -26,8 +26,8 @@ def get_monthly_totals(profile, debits=True):
     monthly_accounts = defaultdict(dict)
     month_account_covered = []
     months = get_months(profile.year)
-    for acct in accounts:
-        for month in months:
+    for month in months:
+        for acct in accounts:
             for trx in acct.transactions(month=month):
                 if trx.date.month not in monthly_accounts:
                     monthly_accounts[trx.date.month] = []
@@ -36,6 +36,8 @@ def get_monthly_totals(profile, debits=True):
                     monthly_accounts[trx.date.month].append(
                         {"label": acct.name, "balance": trx.balance}
                     )
+        if month in monthly_accounts.keys():
+            monthly_accounts[month].sort(key=lambda d: d["balance"])
     return monthly_accounts
 
 
