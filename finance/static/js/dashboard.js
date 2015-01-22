@@ -131,7 +131,7 @@ function HandleYearlyDebitVsCreditData(data) {
         height = 200 - margin.top - margin.bottom;
 
     var y = d3.scale.linear()
-        .domain(d3.extent(data, function(d) { return d[1]; }))
+        .domain(d3.extent(data, function(d) { return parseInt(d[1]); }))
         .range([0, height])
         .nice();
 
@@ -156,14 +156,12 @@ function HandleYearlyDebitVsCreditData(data) {
         .enter()
         .append("rect")
         .attr("class", function(d) {
-            return d[1] < 0 ? "bar negative" : "bar positive";
+            return d[1] < 0 ? "bar positive" : "bar negative";
         })
         .attr("x", function(d) { return x(d[0]); })
         .attr("y", function(d) { return y(Math.min(0, d[1])); })
         .attr("width", x.rangeBand())
-        .attr("height", function(d) {
-            return Math.abs(y(d[1]) - y(0));
-        });
+        .attr("height", function(d) { return Math.abs(y(d[1]) - y(0)); });
 
     svg.append("g")
         .attr("class", "y axis")
