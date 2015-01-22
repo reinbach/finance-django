@@ -3,17 +3,10 @@
 
 {% block page-content %}
   {{ block.super }}
-  <h2 class="sub-header">Net Worth</h2>
-  <div class="table-responsive">
-    <div id="net-worth-chart">
-      <img id="net-worth-chart-loader" src="{% static 'img/ajax-loader.gif' %}" />
-    </div>
-  </div>
-
   <h2 class="sub-header">{{ debits_title }} vs {{ credits_title }}</h2>
   <div class="table-responsive">
-    <div id="debit-vs-credits-chart">
-      <img id="debit-vs-credits-chart-loader" src="{% static 'img/ajax-loader.gif' %}" />
+    <div id="monthly-debit-vs-credit-charts">
+      <img id="monthly-debit-vs-credit-charts-loader" src="{% static 'img/ajax-loader.gif' %}" />
     </div>
   </div>
 
@@ -31,6 +24,10 @@
   <script src="{% static 'js/dashboard.js' %}"></script>
   <script>
     $(function() {
+        d3.json("{% url 'data.yearly_debit_vs_credit' %}", function(error, data) {
+            HandleYearlyDebitVsCreditData(data);
+        });
+
         d3.json("{% url 'data.yearly_debit' %}", function(error, data) {
             HandleYearlyDebitData(data);
         });

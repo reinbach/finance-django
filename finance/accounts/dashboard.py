@@ -63,7 +63,3 @@ def get_monthly_debits_vs_credits(profile):
         credit_total = sum([x.get("balance", 0) for x in credits])
         monthly_totals.append((month, debit_total + credit_total))
     return monthly_totals
-
-
-def get_networth(profile):
-    pass

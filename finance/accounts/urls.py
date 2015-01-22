@@ -5,7 +5,7 @@ from finance.accounts.views import (
     AccountTypeDeleteView, AccountView, AccountAddView, AccountEditView,
     AccountDeleteView, AccountTransactionView, TransactionAddView,
     TransactionEditView, TransactionDeleteView, TransactionImportView,
-    TransactionImportConfirmView, DataYearlyDebit
+    TransactionImportConfirmView, DataYearlyDebit, DataYearlyDebitVsCredit
 )
 
 
@@ -20,6 +20,9 @@ urlpatterns = patterns(
     url("^data/yearly/debit/$",
         login_required(DataYearlyDebit.as_view()),
         name="data.yearly_debit"),
+    url("^data/yearly/debit/vs/credit/$",
+        login_required(DataYearlyDebitVsCredit.as_view()),
+        name="data.yearly_debit_vs_credit"),
 
     # account types
     url("^settings/account_type/add/$",

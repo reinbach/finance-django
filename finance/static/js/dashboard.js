@@ -1,3 +1,10 @@
+var month_display = d3.scale.quantize()
+    .range(["Janurary", "February", "March", "April", "May",
+            "June", "July", "August", "September", "October",
+            "November", "December"])
+    .domain([1,12]);
+
+
 function HandleYearlyDebitData(data) {
     $("#monthly-debit-charts-loader").hide();
 
@@ -9,12 +16,6 @@ function HandleYearlyDebitData(data) {
         .value(function(d) {
             return d.balance;
         });
-
-    var month_display = d3.scale.quantize()
-        .range(["Janurary", "February", "March", "April", "May",
-                "June", "July", "August", "September", "October",
-                "November", "December"])
-        .domain([1,12]);
 
     var svg = d3.select("#monthly-debit-charts").append("svg")
         .attr("width", width)
@@ -120,4 +121,58 @@ function HandleYearlyDebitData(data) {
             });
 
     }
+}
+
+function HandleYearlyDebitVsCreditData(data) {
+    $("#monthly-debit-vs-credit-charts-loader").hide();
+
+    var margin = {top: 10, right: 10, bottom: 10, left: 50};
+    var width = 1200 - margin.right - margin.left,
+        height = 200 - margin.top - margin.bottom;
+
+    var y = d3.scale.linear()
+        .domain(d3.extent(data, function(d) { return d[1]; }))
+        .range([0, height])
+        .nice();
+
+    var x = d3.scale.ordinal()
+        .domain(data.map(function(d) { return d[0]; }))
+        .rangeRoundBands([0, width], .2);
+
+    var months = d3.keys(data);
+
+    var yAxis = d3.svg.axis()
+        .scale(y)
+        .orient("left");
+
+    var svg = d3.select("#monthly-debit-vs-credit-charts").append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+        .append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    svg.selectAll(".bar")
+        .data(data)
+        .enter()
+        .append("rect")
+        .attr("class", function(d) {
+            return d[1] < 0 ? "bar negative" : "bar positive";
+        })
+        .attr("x", function(d) { return x(d[0]); })
+        .attr("y", function(d) { return y(Math.min(0, d[1])); })
+        .attr("width", x.rangeBand())
+        .attr("height", function(d) {
+            return Math.abs(y(d[1]) - y(0));
+        });
+
+    svg.append("g")
+        .attr("class", "y axis")
+        .call(yAxis);
+
+    svg.append("g")
+        .attr("class", "x axis")
+        .append("line")
+        .attr("y1", y(0))
+        .attr("y2", y(0))
+        .attr("x2", width);
 }

@@ -8,7 +8,8 @@ from django.template.loader import render_to_string
 from django.views.generic import (TemplateView, CreateView, UpdateView, View,
                                   DeleteView, ListView, FormView, DetailView)
 from finance.accounts.dashboard import (get_monthly_totals, get_debits_title,
-                                        get_credits_title)
+                                        get_credits_title,
+                                        get_monthly_debits_vs_credits)
 from finance.accounts.forms import (AccountTypeForm, TransactionImportForm,
                                     TransactionFormSet, AccountForm,
                                     TransactionImportFormSet)
@@ -380,3 +381,9 @@ class DataYearlyDebit(View):
     def get(self, request):
         profile = get_user_profile(request.user)
         return JsonResponse(get_monthly_totals(profile))
+
+
+class DataYearlyDebitVsCredit(View):
+    def get(self, request):
+        profile = get_user_profile(request.user)
+        return JsonResponse(get_monthly_debits_vs_credits(profile), safe=False)
