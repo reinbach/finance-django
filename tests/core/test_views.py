@@ -106,7 +106,7 @@ class TestLogoutView(BaseWebTest):
     def test_view(self):
         response = self.app.get(reverse("logout"), user=self.user)
         assert response.status_code == 200
-        assert "You have successfully logged out" in response
+        assert "You have successfully signed out" in response
 
 
 class TestProfileView(BaseWebTest):

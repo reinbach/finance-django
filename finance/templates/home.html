@@ -25,7 +25,7 @@
                     <a href="{% url 'accounts.dashboard' %}">Dashboard</a>
                   </li>
                   <li>
-                    <a href="{% url 'logout' %}">Log Out</a>
+                    <a href="{% url 'logout' %}">Sign Out</a>
                   </li>
                 {% endif %}
               </ul>
@@ -41,11 +41,11 @@
             <p class="lead">A single place to view your finances.</p>
             {% if not user.is_authenticated %}
               <p class="lead">
+                <a href="{% url 'login' %}" class="btn btn-lg btn-success">
+                  Sign In
+                </a>
                 <a href="{% url 'register' %}" class="btn btn-lg btn-info">
                   Register
-                </a>
-                <a href="{% url 'login' %}" class="btn btn-lg btn-success">
-                  Log In
                 </a>
               </p>
             {% endif %}
