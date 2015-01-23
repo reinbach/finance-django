@@ -8,7 +8,7 @@ var month_display = d3.scale.quantize()
 function HandleYearlyDebitData(data) {
     $("#monthly-debit-charts-loader").hide();
 
-    var width = 1200,
+    var width = 1000,
         height = 800;
 
     var pie = d3.layout.pie()
@@ -127,7 +127,7 @@ function HandleYearlyDebitVsCreditData(data) {
     $("#monthly-debit-vs-credit-charts-loader").hide();
 
     var margin = {top: 10, right: 10, bottom: 10, left: 50};
-    var width = 1200 - margin.right - margin.left,
+    var width = 1000 - margin.right - margin.left,
         height = 200 - margin.top - margin.bottom;
 
     var y = d3.scale.linear()
