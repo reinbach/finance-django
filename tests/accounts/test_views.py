@@ -733,11 +733,13 @@ class TestDataYearlyDebitVsCredit(BaseWebTest):
                                  account_type=income_type)
         bank = account_factory(profile=self.profile, account_type=asset_type)
         trx1 = transaction_factory(account_debit=exp, account_credit=bank,
-                                  amount=10.00,
+                                   amount=10.00,
                                    date=datetime.date(self.profile.year, 5, 1))
         trx2 = transaction_factory(account_debit=bank, account_credit=income,
-                                  amount=100.00,
-                                  date=datetime.date(self.profile.year, 5, 16))
+                                   amount=100.00,
+                                   date=datetime.date(
+                                       self.profile.year, 5, 16
+                                   ))
         response = self.app.get(reverse("data.yearly_debit_vs_credit"),
                                 user=self.user)
         assert response.status_code == 200

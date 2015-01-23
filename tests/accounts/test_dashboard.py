@@ -44,7 +44,7 @@ class TestGetMonthlyAccounts():
     def test_debit_multiple_trx(self):
         p = profile_factory()
         expense_type = account_type_factory(profile=p, yearly=True,
-                                        default_type="DEBIT")
+                                            default_type="DEBIT")
         asset_type = account_type_factory(profile=p)
         exp = account_factory(profile=p, account_type=expense_type)
         bank = account_factory(profile=p, account_type=asset_type)
@@ -67,7 +67,7 @@ class TestGetMonthlyAccounts():
     def test_debit_multiple(self):
         p = profile_factory()
         expense_type = account_type_factory(profile=p, yearly=True,
-                                          default_type="DEBIT")
+                                            default_type="DEBIT")
         asset_type = account_type_factory(profile=p)
         bank = account_factory(profile=p, account_type=asset_type)
         exp1 = account_factory(profile=p, account_type=expense_type)
@@ -115,7 +115,7 @@ class TestGetMonthlyAccounts():
     def test_credit_single_trx(self):
         p = profile_factory()
         income_type = account_type_factory(profile=p, yearly=True,
-                                          default_type="CREDIT")
+                                           default_type="CREDIT")
         asset_type = account_type_factory(profile=p)
         inc = account_factory(profile=p, account_type=income_type)
         bank = account_factory(profile=p, account_type=asset_type)
@@ -129,7 +129,7 @@ class TestGetMonthlyAccounts():
     def test_credit_multiple_trx(self):
         p = profile_factory()
         income_type = account_type_factory(profile=p, yearly=True,
-                                          default_type="CREDIT")
+                                           default_type="CREDIT")
         asset_type = account_type_factory(profile=p)
         inc = account_factory(profile=p, account_type=income_type)
         bank = account_factory(profile=p, account_type=asset_type)
@@ -148,7 +148,7 @@ class TestGetMonthlyAccounts():
     def test_credit_multiple(self):
         p = profile_factory()
         income_type = account_type_factory(profile=p, yearly=True,
-                                          default_type="CREDIT")
+                                           default_type="CREDIT")
         asset_type = account_type_factory(profile=p)
         bank = account_factory(profile=p, account_type=asset_type)
         inc1 = account_factory(profile=p, account_type=income_type)
@@ -266,9 +266,9 @@ class TestMonthlyDebitsVsCredits():
     def test_totals(self):
         p = profile_factory(current_year=2010)
         expense_type = account_type_factory(profile=p, yearly=True,
-                                        default_type="DEBIT")
+                                            default_type="DEBIT")
         income_type = account_type_factory(profile=p, yearly=True,
-                                        default_type="CREDIT")
+                                           default_type="CREDIT")
         asset_type = account_type_factory(profile=p)
         bank = account_factory(profile=p, account_type=asset_type)
         inc1 = account_factory(profile=p, account_type=income_type)
