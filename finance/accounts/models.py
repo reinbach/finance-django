@@ -1,3 +1,5 @@
+import datetime
+
 from django.core.cache import cache
 from django.db import models
 from django.db.models import Q
@@ -142,9 +144,19 @@ class Transaction(models.Model):
     def save(self, **kwargs):
         super(Transaction, self).save(**kwargs)
         profile = self.account_debit.profile
+        if isinstance(self.date, datetime.date):
+            year = self.date.year
+        else:
+            year = self.date[:4]
         cache.delete_many([
             self.account_debit.cache_key,
             self.account_credit.cache_key,
-            "{p.pk}-{p.year}-debits-vs-credits".format(p=profile),
-            "{p.pk}-{p.year}-debits-vs-credits".format(p=profile),
+            "{0}-{1}-debits-vs-credits".format(
+                profile.pk,
+                year
+            ),
+            "{0}-{1}-debits-vs-credits".format(
+                profile.pk,
+                year
+            ),
         ])
