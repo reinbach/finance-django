@@ -97,6 +97,17 @@ class TestGetMonthlyAccounts():
             {"label": exp1.name, "balance": trx4.amount + trx5.amount},
         ]
 
+        # test cache
+        trxs = get_monthly_totals(p)
+        assert len(trxs) == 2
+        assert trxs[5] == [
+            {"label": exp2.name, "balance": trx2.amount - trx3.amount},
+            {"label": exp1.name, "balance": trx1.amount}
+        ]
+        assert trxs[8] == [
+            {"label": exp1.name, "balance": trx4.amount + trx5.amount},
+        ]
+
     def test_credit_empty(self):
         p = profile_factory()
         assert get_monthly_totals(p, False) == {}
@@ -157,6 +168,17 @@ class TestGetMonthlyAccounts():
         trx5 = transaction_factory(account_debit=bank, account_credit=inc1,
                                    amount=28.00,
                                    date=datetime.date(p.year, 8, 12))
+        trxs = get_monthly_totals(p, False)
+        assert len(trxs) == 2
+        assert trxs[5] == [
+            {"label": inc1.name, "balance": -trx1.amount},
+            {"label": inc2.name, "balance": -trx2.amount + trx3.amount}
+        ]
+        assert trxs[8] == [
+            {"label": inc1.name, "balance": -trx4.amount - trx5.amount},
+        ]
+
+        # test cache
         trxs = get_monthly_totals(p, False)
         assert len(trxs) == 2
         assert trxs[5] == [
@@ -267,6 +289,11 @@ class TestMonthlyDebitsVsCredits():
                             amount=30.00, date=datetime.date(2010, 2, 1))
         transaction_factory(account_debit=exp1, account_credit=bank,
                             amount=35.00, date=datetime.date(2011, 2, 1))
+        monthly_debits_credits = get_monthly_debits_vs_credits(p)
+        assert (1, -50) in monthly_debits_credits
+        assert (2, 30) in monthly_debits_credits
+
+        # test cache
         monthly_debits_credits = get_monthly_debits_vs_credits(p)
         assert (1, -50) in monthly_debits_credits
         assert (2, 30) in monthly_debits_credits

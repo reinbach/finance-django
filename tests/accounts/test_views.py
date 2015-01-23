@@ -729,7 +729,8 @@ class TestDataYearlyDebitVsCredit(BaseWebTest):
                                            default_type="CREDIT")
         asset_type = account_type_factory(profile=self.profile)
         exp = account_factory(profile=self.profile, account_type=expense_type)
-        income = account_factory(profile=self.profile, account_type=income_type)
+        income = account_factory(profile=self.profile,
+                                 account_type=income_type)
         bank = account_factory(profile=self.profile, account_type=asset_type)
         trx1 = transaction_factory(account_debit=exp, account_credit=bank,
                                   amount=10.00,
@@ -737,15 +738,18 @@ class TestDataYearlyDebitVsCredit(BaseWebTest):
         trx2 = transaction_factory(account_debit=bank, account_credit=income,
                                   amount=100.00,
                                   date=datetime.date(self.profile.year, 5, 16))
-        response = self.app.get(reverse("data.yearly_debit_vs_credit"), user=self.user)
+        response = self.app.get(reverse("data.yearly_debit_vs_credit"),
+                                user=self.user)
         assert response.status_code == 200
         res = json.loads(response.body)
         assert res == [[1, 0], [2, 0], [3, 0], [4, 0],
-                       [5, u"{:.2f}".format(trx1.amount - trx2.amount)], [6, 0], [7, 0],
-                       [8, 0], [9, 0], [10, 0], [11, 0], [12, 0]]
+                       [5, u"{:.2f}".format(trx1.amount - trx2.amount)],
+                       [6, 0], [7, 0], [8, 0], [9, 0], [10, 0], [11, 0],
+                       [12, 0]]
 
     def test_view_empty(self):
-        response = self.app.get(reverse("data.yearly_debit_vs_credit"), user=self.user)
+        response = self.app.get(reverse("data.yearly_debit_vs_credit"),
+                                user=self.user)
         assert response.status_code == 200
         res = json.loads(response.body)
         assert res == [[1, 0], [2, 0], [3, 0], [4, 0], [5, 0], [6, 0], [7, 0],
@@ -771,7 +775,8 @@ class TestDataYearlyDebitVsCredit(BaseWebTest):
         transaction_factory(account_debit=bank, account_credit=inc,
                             amount=100.00,
                             date=datetime.date(p.year, 5, 16))
-        response = self.app.get(reverse("data.yearly_debit_vs_credit"), user=self.user)
+        response = self.app.get(reverse("data.yearly_debit_vs_credit"),
+                                user=self.user)
         assert response.status_code == 200
         res = json.loads(response.body)
         assert res == [[1, 0], [2, 0], [3, 0], [4, 0], [5, 0], [6, 0], [7, 0],

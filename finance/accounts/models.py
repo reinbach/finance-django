@@ -141,5 +141,10 @@ class Transaction(models.Model):
 
     def save(self, **kwargs):
         super(Transaction, self).save(**kwargs)
-        cache.delete_many([self.account_debit.cache_key,
-                           self.account_credit.cache_key])
+        profile = self.account_debit.profile
+        cache.delete_many([
+            self.account_debit.cache_key,
+            self.account_credit.cache_key,
+            "{p.pk}-{p.year}-debits-vs-credits".format(p=profile),
+            "{p.pk}-{p.year}-debits-vs-credits".format(p=profile),
+        ])
