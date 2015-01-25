@@ -19,7 +19,7 @@ function HandleYearlyDebitData(data) {
 
     var svg = d3.select("#monthly-debit-charts").append("svg")
         .attr("width", width)
-        .attr("height", height)
+        .attr("height", height);
 
     var key = function(d) {
         return window.btoa(d.data.label).replace(/=/g, "");
@@ -38,9 +38,12 @@ function HandleYearlyDebitData(data) {
     svg.attr("height",
              d3.max([height_needed, height]));
 
+    var color_set = new ColorSet();
+
     for (var i in months) {
+        colors = color_set.getSet("#1569c7", data[months[i]].length, 5);
         var color = d3.scale.ordinal()
-            .range(colors.slice(10, 10 + data[months[i]].length))
+            .range(colors)
             .domain([
                 d3.min(data[months[i]], function(d) {
                     return d.label;
@@ -75,7 +78,7 @@ function HandleYearlyDebitData(data) {
             .attr(
                 "transform",
                 "translate(" + block_width + "," + block_height + ")"
-            )
+            );
 
         // add title
         block.append("text")
@@ -87,7 +90,7 @@ function HandleYearlyDebitData(data) {
 
         slices = block.selectAll(".arc")
             .data(pie(data[months[i]]))
-            .enter()
+            .enter();
 
         // create pie chart
         slices.append("g")
@@ -149,7 +152,8 @@ function HandleYearlyDebitVsCreditData(data) {
         .attr("width", width + margin.left + margin.right)
         .attr("height", height + margin.top + margin.bottom)
         .append("g")
-        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+        .attr("transform", "translate(" + margin.left + "," +
+              margin.top + ")");
 
     svg.selectAll(".bar")
         .data(data)
