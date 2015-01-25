@@ -358,7 +358,6 @@ ColorSet.prototype.setStart = function(start) {
         this.start = "#000000";
         break;
     default:
-        // check if valid value
         var index = this.color_options.indexOf[start];
         if (index != -1) {
             this.start = start;
